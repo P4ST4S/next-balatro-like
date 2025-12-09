@@ -154,7 +154,7 @@ function checkStraight(cards: Card[]): Card[] | null {
  * - Two Pair (4 cards)
  * - Pair (2 cards)
  * - High Card (1 card)
- * - Flush (1-5 cards of same suit)
+ * - Flush (exactly 5 cards of same suit)
  *
  * @param cards - Array of 1-5 cards to evaluate (the played hand)
  * @returns Object containing the hand type and array of scoring cards
@@ -177,8 +177,8 @@ export function evaluatePokerHand(cards: Card[]): PokerHandResult {
     .map((group) => group.length)
     .sort((a, b) => b - a);
 
-  // Check for flush (all same suit)
-  const isFlush = suitGroups.size === 1;
+  // Check for flush (all same suit AND exactly 5 cards)
+  const isFlush = suitGroups.size === 1 && cards.length === 5;
 
   // Check for straight
   const straightCards = checkStraight(cards);
