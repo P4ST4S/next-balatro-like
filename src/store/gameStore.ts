@@ -182,8 +182,8 @@ export const useGameStore = create<GameStore>()(
             // Get selected cards from current hand
             const selectedCards = state.currentHand.filter((c) => c.selected);
             
-            // Need exactly 5 cards to play a hand
-            if (selectedCards.length !== 5) {
+            // Need at least 1 card and at most 5 cards to play a hand
+            if (selectedCards.length < 1 || selectedCards.length > 5) {
               return state;
             }
 
@@ -703,9 +703,10 @@ export const useGameStore = create<GameStore>()(
  * Selectors for common state queries
  */
 export const selectors = {
-  canPlayHand: (state: GameStore) => 
-    state.combat.handsRemaining > 0 &&
-    state.currentHand.filter((c) => c.selected).length === 5,
+  canPlayHand: (state: GameStore) => {
+    const selectedCount = state.currentHand.filter((c) => c.selected).length;
+    return state.combat.handsRemaining > 0 && selectedCount >= 1 && selectedCount <= 5;
+  },
   canDiscard: (state: GameStore) =>
     state.combat.discardsRemaining > 0 && state.currentHand.length > 0,
   canDiscardHand: (state: GameStore) =>

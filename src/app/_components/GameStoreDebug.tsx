@@ -6,6 +6,9 @@ import type { Card } from "@/types/game";
 import { evaluatePokerHand } from "@/lib/pokerEvaluator";
 import { calculateScore } from "@/lib/scoringEngine";
 import { JOKER_PLUS_MULT, JOKER_PLUS_CHIPS, JOKER_FLUSH_MULTIPLIER } from "@/lib/jokers";
+import { AnimatedCard } from "./AnimatedCard";
+import { ScoreAnimation } from "./ScoreAnimation";
+import { useState } from "react";
 
 /**
  * Debug component to visualize and interact with the game store
@@ -44,6 +47,13 @@ export function GameStoreDebug() {
   const hasWon = useGameStore(selectors.hasWon);
   const hasLost = useGameStore(selectors.hasLost);
 
+  const [showScoreAnimation, setShowScoreAnimation] = useState(false);
+  const [lastScoreResult, setLastScoreResult] = useState<{
+    chips: number;
+    mult: number;
+    score: number;
+  } | null>(null);
+
   // Initialize a test deck
   const initializeDeck = () => {
     const suits: Card["suit"][] = ["hearts", "diamonds", "clubs", "spades"];
@@ -71,11 +81,11 @@ export function GameStoreDebug() {
     setDeck(newDeck);
   };
 
-  // Evaluate current selected hand if exactly 5 cards are selected
+  // Evaluate current selected hand if 1-5 cards are selected
   const selectedCards = currentHand.filter((c) => c.selected);
   let handEvaluation: { handType: string; score: number; breakdown: string } | null = null;
   
-  if (selectedCards.length === 5) {
+  if (selectedCards.length >= 1 && selectedCards.length <= 5) {
     const handResult = evaluatePokerHand(selectedCards);
     const scoreResult = calculateScore(handResult.scoringCards, handResult.handType, inventory.jokers);
     handEvaluation = {
@@ -84,6 +94,25 @@ export function GameStoreDebug() {
       breakdown: `${scoreResult.totalChips} chips × ${scoreResult.totalMult} mult = ${scoreResult.finalScore}`,
     };
   }
+
+  const handlePlayHand = () => {
+    if (selectedCards.length >= 1 && selectedCards.length <= 5) {
+      const handResult = evaluatePokerHand(selectedCards);
+      const scoreResult = calculateScore(handResult.scoringCards, handResult.handType, inventory.jokers);
+      
+      setLastScoreResult({
+        chips: scoreResult.totalChips,
+        mult: scoreResult.totalMult,
+        score: scoreResult.finalScore,
+      });
+      setShowScoreAnimation(true);
+      
+      // Play the hand after a brief delay to let animation start
+      setTimeout(() => {
+        playHand();
+      }, 100);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -156,7 +185,7 @@ export function GameStoreDebug() {
             Status: {hasWon ? "🎉 Won!" : hasLost ? "💀 Lost!" : "🎯 In Progress"}
           </p>
           <div className={styles.buttonGroup}>
-            <button className={styles.button} onClick={playHand} disabled={!canPlayHand}>
+            <button className={styles.button} onClick={handlePlayHand} disabled={!canPlayHand}>
               Play Hand
             </button>
             <button className={styles.button} onClick={useDiscard} disabled={!canDiscard}>
@@ -250,7 +279,7 @@ export function GameStoreDebug() {
         <section>
           <h3 className={styles.sectionTitle}>Hand Management</h3>
           <p className={styles.paragraph}>
-            ✅ Selected: <strong>{selectedCardsCount}</strong> / 5
+            ✅ Selected: <strong>{selectedCardsCount}</strong> / 5 (play 1-5 cards)
           </p>
           {handEvaluation && (
             <>
@@ -290,24 +319,30 @@ export function GameStoreDebug() {
         <div className={styles.handSection}>
           <h3 className={styles.sectionTitle}>Current Hand (Click to Select/Deselect)</h3>
           <div className={styles.cardGrid}>
-            {currentHand.map((card) => (
-              <button
+            {currentHand.map((card, index) => (
+              <AnimatedCard
                 key={card.id}
-                className={`${styles.card} ${card.selected ? styles.cardSelected : ""}`}
+                card={card}
+                index={index}
                 onClick={() => selectCard(card.id)}
-              >
-                <div className={styles.cardContent}>
-                  <span className={styles.cardRank}>{card.rank}</span>
-                  <span className={styles.cardSuit}>
-                    {card.suit === "hearts" && "♥"}
-                    {card.suit === "diamonds" && "♦"}
-                    {card.suit === "clubs" && "♣"}
-                    {card.suit === "spades" && "♠"}
-                  </span>
-                </div>
-              </button>
+                isSelected={card.selected || false}
+              />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Score Animation */}
+      {showScoreAnimation && lastScoreResult && (
+        <div className={styles.scoreAnimationContainer}>
+          <ScoreAnimation
+            chips={lastScoreResult.chips}
+            mult={lastScoreResult.mult}
+            finalScore={lastScoreResult.score}
+            onComplete={() => {
+              setTimeout(() => setShowScoreAnimation(false), 1000);
+            }}
+          />
         </div>
       )}
 

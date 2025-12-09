@@ -147,7 +147,7 @@ function checkStraight(cards: Card[]): Card[] | null {
  * Evaluates a poker hand and returns the hand type and scoring cards
  * According to Balatro rules, only the cards that form the hand are scoring cards
  *
- * @param cards - Array of 5 cards to evaluate (the played hand)
+ * @param cards - Array of 1-5 cards to evaluate (the played hand)
  * @returns Object containing the hand type and array of scoring cards
  *
  * @example
@@ -156,8 +156,8 @@ function checkStraight(cards: Card[]): Card[] | null {
  * // Returns: { handType: "Pair", scoringCards: [K♥, K♠] }
  */
 export function evaluatePokerHand(cards: Card[]): PokerHandResult {
-  if (cards.length !== 5) {
-    throw new Error("Poker hand must contain exactly 5 cards");
+  if (cards.length < 1 || cards.length > 5) {
+    throw new Error("Poker hand must contain between 1 and 5 cards");
   }
 
   const rankGroups = groupByRank(cards);

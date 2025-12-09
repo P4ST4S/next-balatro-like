@@ -1,0 +1,81 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  min-width: 300px;
+}
+
+.breakdown {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  color: #94a3b8;
+}
+
+.number {
+  font-size: 32px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  min-width: 60px;
+  text-align: center;
+}
+
+.operator {
+  font-size: 32px;
+  font-weight: bold;
+  color: #f59e0b;
+}
+
+.equals {
+  font-size: 32px;
+  font-weight: bold;
+  color: #10b981;
+}
+
+.finalScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(192, 38, 211, 0.4);
+}
+
+.scoreValue {
+  font-size: 48px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  color: #fef3c7;
+  text-shadow: 0 0 10px #ef4444;
+}
+
+.scoreLabel {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fef3c7;
+  opacity: 0.9;
+}
