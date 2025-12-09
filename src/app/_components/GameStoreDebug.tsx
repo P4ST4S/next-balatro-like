@@ -3,6 +3,8 @@
 import { useGameStore, selectors } from "@/store/gameStore";
 import styles from "./GameStoreDebug.module.css";
 import type { Card } from "@/types/game";
+import { evaluatePokerHand } from "@/lib/pokerEvaluator";
+import { calculateScore } from "@/lib/scoringEngine";
 
 /**
  * Debug component to visualize and interact with the game store
@@ -62,6 +64,20 @@ export function GameStoreDebug() {
     
     setDeck(newDeck);
   };
+
+  // Evaluate current selected hand if exactly 5 cards are selected
+  const selectedCards = currentHand.filter((c) => c.selected);
+  let handEvaluation: { handType: string; score: number; breakdown: string } | null = null;
+  
+  if (selectedCards.length === 5) {
+    const handResult = evaluatePokerHand(selectedCards);
+    const scoreResult = calculateScore(handResult.scoringCards, handResult.handType);
+    handEvaluation = {
+      handType: handResult.handType,
+      score: scoreResult.finalScore,
+      breakdown: `${scoreResult.totalChips} chips × ${scoreResult.totalMult} mult = ${scoreResult.finalScore}`,
+    };
+  }
 
   return (
     <div className={styles.container}>
@@ -183,6 +199,19 @@ export function GameStoreDebug() {
           <p className={styles.paragraph}>
             ✅ Selected: <strong>{selectedCardsCount}</strong> / 5
           </p>
+          {handEvaluation && (
+            <>
+              <p className={styles.paragraph}>
+                🃏 Hand: <strong>{handEvaluation.handType}</strong>
+              </p>
+              <p className={styles.paragraph}>
+                💯 Score: <strong>{handEvaluation.score}</strong>
+              </p>
+              <p className={styles.paragraph} style={{ fontSize: "0.9em", opacity: 0.8 }}>
+                {handEvaluation.breakdown}
+              </p>
+            </>
+          )}
           <div className={styles.buttonGroup}>
             <button 
               className={styles.button} 

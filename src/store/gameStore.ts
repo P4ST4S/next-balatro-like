@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { GameState } from "@/types/game";
+import { evaluatePokerHand } from "@/lib/pokerEvaluator";
+import { calculateScore } from "@/lib/scoringEngine";
 
 /**
  * Game constants
@@ -155,9 +157,41 @@ export const useGameStore = create<GameStore>()(
 
       playHand: () =>
         set(
-          (state) => ({
-            combat: { ...state.combat, handsPlayed: state.combat.handsPlayed + 1 },
-          }),
+          (state) => {
+            // Get selected cards from current hand
+            const selectedCards = state.currentHand.filter((c) => c.selected);
+            
+            // Need exactly 5 cards to play a hand
+            if (selectedCards.length !== 5) {
+              return state;
+            }
+
+            // Evaluate the poker hand
+            const handResult = evaluatePokerHand(selectedCards);
+            
+            // Calculate the score
+            const scoreResult = calculateScore(handResult.scoringCards, handResult.handType);
+            
+            // Move selected cards to discard pile (deselect them first)
+            const cardsToDiscard = selectedCards.map((c) => ({ ...c, selected: false }));
+            const remainingHand = state.currentHand.filter((c) => !c.selected);
+            
+            // Draw new cards to replenish hand
+            const cardsNeeded = MAX_HAND_SIZE - remainingHand.length;
+            const cardsToDraw = state.deck.slice(0, cardsNeeded);
+            const remainingDeck = state.deck.slice(cardsNeeded);
+
+            return {
+              combat: {
+                ...state.combat,
+                handsPlayed: state.combat.handsPlayed + 1,
+                currentScore: state.combat.currentScore + scoreResult.finalScore,
+              },
+              currentHand: [...remainingHand, ...cardsToDraw],
+              discardPile: [...state.discardPile, ...cardsToDiscard],
+              deck: remainingDeck,
+            };
+          },
           false,
           "playHand"
         ),
@@ -374,7 +408,8 @@ export const useGameStore = create<GameStore>()(
  * Selectors for common state queries
  */
 export const selectors = {
-  canPlayHand: (state: GameStore) => state.currentHand.length > 0,
+  canPlayHand: (state: GameStore) => 
+    state.currentHand.filter((c) => c.selected).length === 5,
   canDiscard: (state: GameStore) =>
     state.combat.discardsRemaining > 0 && state.currentHand.length > 0,
   canDiscardHand: (state: GameStore) =>
