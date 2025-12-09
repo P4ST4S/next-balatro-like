@@ -84,6 +84,7 @@ export interface RunState {
  */
 export interface CombatState {
   handsPlayed: number;
+  handsRemaining: number;
   discardsRemaining: number;
   currentScore: number;
   targetScore: number;
