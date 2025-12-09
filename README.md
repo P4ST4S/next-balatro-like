@@ -12,7 +12,10 @@
 
 - **Next.js 16.0.8 (App Router)** — modern routing, React 19 support, Turbopack dev server; requires Node >= 20.9 per docs.
 - **React 19.2.1** — concurrent-ready features ship with App Router.
+- **Zustand 5.0.9** — lightweight state management with DevTools for game logic.
+- **TypeScript 5** — strict typing for all game state and actions.
 - **CSS Modules** — scoped styling in `src/app/page.module.css` to keep the neon theme isolated.
+- **Prettier 3.7.4** — consistent code formatting across the project.
 - **pnpm** — chosen package manager (tracked via `pnpm-lock.yaml`) for fast, content-addressable installs.
 
 ## 🛠 Prerequisites
@@ -31,6 +34,8 @@ pnpm dev
 - Production build: `pnpm build`
 - Preview prod: `pnpm start` (after build)
 - Lint: `pnpm lint`
+- Format code: `pnpm format`
+- Check formatting: `pnpm format:check`
 
 ## 🧭 Project layout
 
@@ -38,6 +43,10 @@ pnpm dev
 - `src/app/page.module.css` — neon card-table aesthetic and responsive grid.
 - `src/app/layout.tsx` — root layout and metadata.
 - `src/app/globals.css` — base resets and typography.
+- `src/store/gameStore.ts` — Zustand store for game state management.
+- `src/types/game.ts` — TypeScript type definitions for game entities.
+- `src/app/_components/GameStoreDebug.tsx` — interactive debug panel for testing the store.
+- `docs/STORE_ARCHITECTURE.md` — comprehensive store documentation.
 
 ## 🎮 Usage
 
@@ -73,6 +82,38 @@ Key sections of the landing page:
 ```
 
 CTA links currently point to `#`; swap in real demo/video URLs when ready.
+
+## 🎮 Game State Management
+
+The project includes a robust Zustand-based state management system. See [`docs/STORE_ARCHITECTURE.md`](./docs/STORE_ARCHITECTURE.md) for full documentation.
+
+### Quick Example
+
+```tsx
+"use client";
+
+import { useGameStore } from "@/store/gameStore";
+
+export function GameComponent() {
+  const money = useGameStore((state) => state.run.money);
+  const addMoney = useGameStore((state) => state.addMoney);
+
+  return (
+    <div>
+      <p>Money: ${money}</p>
+      <button onClick={() => addMoney(5)}>Add $5</button>
+    </div>
+  );
+}
+```
+
+### Testing the Store
+
+Visit http://localhost:3000 in development mode to see the interactive debug panel at the bottom of the page. You can:
+- Change game phases
+- Modify run state (money, ante, blinds)
+- Test combat mechanics
+- Inspect state with React DevTools
 
 ## ✅ Deployment
 
