@@ -21,6 +21,31 @@ export interface Card {
 }
 
 /**
+ * Trigger context for joker callbacks
+ */
+export interface JokerTriggerContext {
+  handType?: string;
+  scoringCards?: Card[];
+  chips: number;
+  mult: number;
+}
+
+/**
+ * Joker trigger result
+ */
+export interface JokerTriggerResult {
+  chipsAdd?: number;
+  multAdd?: number;
+  multMultiply?: number;
+  triggered: boolean;
+}
+
+/**
+ * Joker trigger types
+ */
+export type JokerTriggerType = "onScore" | "onEndCalculation";
+
+/**
  * Joker cards that modify scoring
  */
 export interface Joker {
@@ -28,10 +53,9 @@ export interface Joker {
   name: string;
   description: string;
   rarity: "common" | "uncommon" | "rare" | "legendary";
-  chipsBonus?: number;
-  multBonus?: number;
-  effect?: string;
   sellValue: number;
+  triggerType: JokerTriggerType;
+  trigger: (context: JokerTriggerContext) => JokerTriggerResult;
 }
 
 /**

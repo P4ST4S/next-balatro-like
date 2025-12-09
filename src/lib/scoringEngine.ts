@@ -1,4 +1,4 @@
-import type { Card, Rank } from "@/types/game";
+import type { Card, Rank, Joker } from "@/types/game";
 import type { PokerHandType } from "./pokerEvaluator";
 
 /**
@@ -56,15 +56,17 @@ export interface ScoreResult {
   baseMult: number;
   totalMult: number;
   finalScore: number;
+  triggeredJokers?: string[];
 }
 
 /**
  * Calculate the score for a played hand following Balatro scoring rules
  *
- * Formula: Score = (Base Chips + Card Chips) × (Base Mult + Additional Mult)
+ * Formula: Score = (Base Chips + Card Chips + Joker Chips) × (Base Mult + Joker Mult) × Joker Multipliers
  *
  * @param scoringCards - The cards that contribute to scoring (from evaluatePokerHand)
  * @param handType - The type of poker hand being played
+ * @param jokers - Optional array of jokers that modify scoring
  * @returns Detailed breakdown of the score calculation
  *
  * @example
@@ -79,7 +81,11 @@ export interface ScoreResult {
  * //   finalScore: 60 (30 × 2)
  * // }
  */
-export function calculateScore(scoringCards: Card[], handType: PokerHandType): ScoreResult {
+export function calculateScore(
+  scoringCards: Card[], 
+  handType: PokerHandType,
+  jokers: Joker[] = []
+): ScoreResult {
   // Get base stats for this hand type
   const handStats = HAND_BASE_STATS[handType];
   const baseChips = handStats.baseChips;
@@ -90,14 +96,53 @@ export function calculateScore(scoringCards: Card[], handType: PokerHandType): S
     return sum + CARD_CHIP_VALUES[card.rank];
   }, 0);
 
-  const totalChips = baseChips + cardChips;
+  let totalChips = baseChips + cardChips;
+  let totalMult = baseMult;
+  const triggeredJokers: string[] = [];
 
-  // Step 2: Calculate total multiplier (Base Mult + additional multipliers)
-  // Note: Architecture is open for joker triggers to add to totalMult in future
-  const totalMult = baseMult;
+  // Step 2: Apply "onScore" joker triggers (add chips/mult)
+  for (const joker of jokers) {
+    if (joker.triggerType === "onScore") {
+      const result = joker.trigger({
+        handType,
+        scoringCards,
+        chips: totalChips,
+        mult: totalMult,
+      });
+      
+      if (result.triggered) {
+        triggeredJokers.push(joker.id);
+        if (result.chipsAdd) {
+          totalChips += result.chipsAdd;
+        }
+        if (result.multAdd) {
+          totalMult += result.multAdd;
+        }
+      }
+    }
+  }
 
-  // Step 3: Calculate final score
-  const finalScore = totalChips * totalMult;
+  // Step 3: Calculate base score
+  let finalScore = totalChips * totalMult;
+
+  // Step 4: Apply "onEndCalculation" joker triggers (multiply final score)
+  for (const joker of jokers) {
+    if (joker.triggerType === "onEndCalculation") {
+      const result = joker.trigger({
+        handType,
+        scoringCards,
+        chips: totalChips,
+        mult: totalMult,
+      });
+      
+      if (result.triggered) {
+        triggeredJokers.push(joker.id);
+        if (result.multMultiply) {
+          finalScore = Math.floor(finalScore * result.multMultiply);
+        }
+      }
+    }
+  }
 
   return {
     baseChips,
@@ -106,5 +151,6 @@ export function calculateScore(scoringCards: Card[], handType: PokerHandType): S
     baseMult,
     totalMult,
     finalScore,
+    triggeredJokers,
   };
 }

@@ -5,6 +5,7 @@ import styles from "./GameStoreDebug.module.css";
 import type { Card } from "@/types/game";
 import { evaluatePokerHand } from "@/lib/pokerEvaluator";
 import { calculateScore } from "@/lib/scoringEngine";
+import { JOKER_PLUS_MULT, JOKER_PLUS_CHIPS, JOKER_FLUSH_MULTIPLIER } from "@/lib/jokers";
 
 /**
  * Debug component to visualize and interact with the game store
@@ -31,6 +32,8 @@ export function GameStoreDebug() {
   const drawHand = useGameStore((state) => state.drawHand);
   const selectCard = useGameStore((state) => state.selectCard);
   const discardHand = useGameStore((state) => state.discardHand);
+  const addJoker = useGameStore((state) => state.addJoker);
+  const removeJoker = useGameStore((state) => state.removeJoker);
 
   const canPlayHand = useGameStore(selectors.canPlayHand);
   const canDiscard = useGameStore(selectors.canDiscard);
@@ -71,7 +74,7 @@ export function GameStoreDebug() {
   
   if (selectedCards.length === 5) {
     const handResult = evaluatePokerHand(selectedCards);
-    const scoreResult = calculateScore(handResult.scoringCards, handResult.handType);
+    const scoreResult = calculateScore(handResult.scoringCards, handResult.handType, inventory.jokers);
     handEvaluation = {
       handType: handResult.handType,
       score: scoreResult.finalScore,
@@ -169,6 +172,43 @@ export function GameStoreDebug() {
           <p className={styles.paragraph}>
             ✨ Consumables: <strong>{inventory.consumables.length}</strong>
           </p>
+          <div className={styles.buttonGroup}>
+            <button 
+              className={styles.button} 
+              onClick={() => addJoker(JOKER_PLUS_MULT)}
+              disabled={inventory.jokers.some(j => j.id === JOKER_PLUS_MULT.id)}
+            >
+              Add +4 Mult
+            </button>
+            <button 
+              className={styles.button} 
+              onClick={() => addJoker(JOKER_PLUS_CHIPS)}
+              disabled={inventory.jokers.some(j => j.id === JOKER_PLUS_CHIPS.id)}
+            >
+              Add +15 Chips
+            </button>
+            <button 
+              className={styles.button} 
+              onClick={() => addJoker(JOKER_FLUSH_MULTIPLIER)}
+              disabled={inventory.jokers.some(j => j.id === JOKER_FLUSH_MULTIPLIER.id)}
+            >
+              Add Flush x3
+            </button>
+          </div>
+          {inventory.jokers.length > 0 && (
+            <div className={styles.buttonGroup} style={{ marginTop: '0.5rem' }}>
+              {inventory.jokers.map((joker) => (
+                <button
+                  key={joker.id}
+                  className={styles.button}
+                  onClick={() => removeJoker(joker.id)}
+                  style={{ fontSize: '0.8rem' }}
+                >
+                  Remove {joker.name}
+                </button>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Deck Info */}
