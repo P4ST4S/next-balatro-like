@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import { GameStoreDebug } from "./_components/GameStoreDebug";
 
 type Feature = {
   title: string;
@@ -101,8 +102,8 @@ export default function Home() {
             <p className={styles.kicker}>Balatro-inspired roguelite</p>
             <h1>Stack the deck. Break the game.</h1>
             <p className={styles.lede}>
-              Draft chaotic jokers, chase impossible multipliers, and dance
-              around ruthless blinds. Every shuffle is a bet against the house.
+              Draft chaotic jokers, chase impossible multipliers, and dance around ruthless blinds.
+              Every shuffle is a bet against the house.
             </p>
             <div className={styles.actions}>
               <a className={styles.primary} href="#">
@@ -163,8 +164,8 @@ export default function Home() {
               <h3>Neon-lit systems tuned for momentum</h3>
             </div>
             <p className={styles.sectionNote}>
-              Built to feel like Balatro: tactile chips, greedy multipliers, and
-              bosses that rewrite your plan mid-hand.
+              Built to feel like Balatro: tactile chips, greedy multipliers, and bosses that rewrite
+              your plan mid-hand.
             </p>
           </div>
           <div className={styles.featureGrid}>
@@ -173,9 +174,7 @@ export default function Home() {
                 <div className={styles.featureTag}>{feature.tag}</div>
                 <h4>{feature.title}</h4>
                 <p>{feature.text}</p>
-                {feature.stat ? (
-                  <span className={styles.featureStat}>{feature.stat}</span>
-                ) : null}
+                {feature.stat ? <span className={styles.featureStat}>{feature.stat}</span> : null}
               </article>
             ))}
           </div>
@@ -188,8 +187,7 @@ export default function Home() {
               <h3>Archetypes to gamble with</h3>
             </div>
             <p className={styles.sectionNote}>
-              Each deck bends probability. Pair them with jokers to discover
-              busted lines.
+              Each deck bends probability. Pair them with jokers to discover busted lines.
             </p>
           </div>
           <div className={styles.archetypeGrid}>
@@ -216,8 +214,7 @@ export default function Home() {
               <h3>Moments worth replaying</h3>
             </div>
             <p className={styles.sectionNote}>
-              Break the seed, share it with friends, and race for the highest
-              chip stack.
+              Break the seed, share it with friends, and race for the highest chip stack.
             </p>
           </div>
           <div className={styles.logList}>
@@ -231,6 +228,11 @@ export default function Home() {
               </article>
             ))}
           </div>
+        </section>
+
+        {/* Game Store Debug Panel */}
+        <section className={styles.section}>
+          <GameStoreDebug />
         </section>
       </main>
     </div>
