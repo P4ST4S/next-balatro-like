@@ -3,6 +3,12 @@ import { devtools } from "zustand/middleware";
 import type { GameState } from "@/types/game";
 
 /**
+ * Game constants
+ */
+const MAX_HAND_SIZE = 8;
+const MAX_CARDS_SELECTED = 5;
+
+/**
  * Initial game state with default values
  * - Starting money: $4 (standard Balatro starting amount)
  * - Ante 1, Round 1, Small Blind (beginning of run)
@@ -259,7 +265,7 @@ export const useGameStore = create<GameStore>()(
           "drawCards"
         ),
 
-      drawHand: (maxHandSize = 8) =>
+      drawHand: (maxHandSize = MAX_HAND_SIZE) =>
         set(
           (state) => {
             const cardsNeeded = maxHandSize - state.currentHand.length;
@@ -294,8 +300,8 @@ export const useGameStore = create<GameStore>()(
             // Count currently selected cards
             const selectedCount = state.currentHand.filter((c) => c.selected).length;
 
-            // Don't allow more than 5 cards to be selected
-            if (selectedCount >= 5) return state;
+            // Don't allow more than MAX_CARDS_SELECTED to be selected
+            if (selectedCount >= MAX_CARDS_SELECTED) return state;
 
             // Select the card
             return {
@@ -323,7 +329,7 @@ export const useGameStore = create<GameStore>()(
             const cardsToDiscard = selectedCards.map((c) => ({ ...c, selected: false }));
 
             // Draw new cards to replenish hand
-            const cardsNeeded = 8 - remainingHand.length;
+            const cardsNeeded = MAX_HAND_SIZE - remainingHand.length;
             const cardsToDraw = state.deck.slice(0, cardsNeeded);
             const remainingDeck = state.deck.slice(cardsNeeded);
 
