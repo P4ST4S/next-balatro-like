@@ -10,6 +10,10 @@ import { AnimatedCard } from "./AnimatedCard";
 import { ScoreAnimation } from "./ScoreAnimation";
 import { useState } from "react";
 
+// Animation timing constants
+const PLAY_HAND_DELAY_MS = 100;
+const SCORE_ANIMATION_COMPLETE_DELAY_MS = 1000;
+
 /**
  * Debug component to visualize and interact with the game store
  * Useful for development and testing
@@ -110,7 +114,7 @@ export function GameStoreDebug() {
       // Play the hand after a brief delay to let animation start
       setTimeout(() => {
         playHand();
-      }, 100);
+      }, PLAY_HAND_DELAY_MS);
     }
   };
 
@@ -340,7 +344,7 @@ export function GameStoreDebug() {
             mult={lastScoreResult.mult}
             finalScore={lastScoreResult.score}
             onComplete={() => {
-              setTimeout(() => setShowScoreAnimation(false), 1000);
+              setTimeout(() => setShowScoreAnimation(false), SCORE_ANIMATION_COMPLETE_DELAY_MS);
             }}
           />
         </div>

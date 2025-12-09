@@ -4,6 +4,13 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
 import styles from "./ScoreAnimation.module.css";
 
+// Animation timing constants
+const CHIPS_ANIMATION_DURATION = 0.8;
+const MULT_ANIMATION_DURATION = 0.6;
+const SCORE_ANIMATION_DURATION = 1.0;
+const PHASE_DELAY_MS = 200;
+const MULTIPLY_PHASE_DELAY_MS = 400;
+
 interface ScoreAnimationProps {
   chips: number;
   mult: number;
@@ -26,33 +33,33 @@ export function ScoreAnimation({ chips, mult, finalScore, onComplete }: ScoreAni
       // Phase 1: Count up chips
       setPhase("chips");
       chipsControl = animate(chipsDisplay, chips, {
-        duration: 0.8,
+        duration: CHIPS_ANIMATION_DURATION,
         ease: "easeOut",
       });
       await chipsControl;
 
       // Wait a moment
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, PHASE_DELAY_MS));
 
       // Phase 2: Count up mult
       setPhase("mult");
       multControl = animate(multDisplay, mult, {
-        duration: 0.6,
+        duration: MULT_ANIMATION_DURATION,
         ease: "easeOut",
       });
       await multControl;
 
       // Wait a moment
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, PHASE_DELAY_MS));
 
       // Phase 3: Show multiplication
       setPhase("multiply");
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await new Promise((resolve) => setTimeout(resolve, MULTIPLY_PHASE_DELAY_MS));
 
       // Phase 4: Count up final score
       setPhase("complete");
       scoreControl = animate(scoreDisplay, finalScore, {
-        duration: 1.0,
+        duration: SCORE_ANIMATION_DURATION,
         ease: "easeOut",
       });
       await scoreControl;
