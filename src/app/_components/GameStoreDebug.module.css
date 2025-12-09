@@ -76,3 +76,60 @@
   font-size: 12px;
   color: #888;
 }
+
+.handSection {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.card {
+  background-color: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cardSelected {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+  transform: translateY(-8px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardRank {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+}
+
+.cardSuit {
+  font-size: 28px;
+  line-height: 1;
+}

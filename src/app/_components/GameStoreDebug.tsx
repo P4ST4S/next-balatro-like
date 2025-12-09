@@ -2,6 +2,7 @@
 
 import { useGameStore, selectors } from "@/store/gameStore";
 import styles from "./GameStoreDebug.module.css";
+import type { Card } from "@/types/game";
 
 /**
  * Debug component to visualize and interact with the game store
@@ -24,10 +25,43 @@ export function GameStoreDebug() {
   const useDiscard = useGameStore((state) => state.useDiscard);
   const addScore = useGameStore((state) => state.addScore);
   const resetGame = useGameStore((state) => state.resetGame);
+  const setDeck = useGameStore((state) => state.setDeck);
+  const drawHand = useGameStore((state) => state.drawHand);
+  const selectCard = useGameStore((state) => state.selectCard);
+  const discardHand = useGameStore((state) => state.discardHand);
 
   const canPlayHand = useGameStore(selectors.canPlayHand);
   const canDiscard = useGameStore(selectors.canDiscard);
+  const canDiscardHand = useGameStore(selectors.canDiscardHand);
+  const selectedCardsCount = useGameStore(selectors.selectedCardsCount);
   const hasWon = useGameStore(selectors.hasWon);
+
+  // Initialize a test deck
+  const initializeDeck = () => {
+    const suits: Card["suit"][] = ["hearts", "diamonds", "clubs", "spades"];
+    const ranks: Card["rank"][] = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+    
+    const newDeck: Card[] = [];
+    let idCounter = 0;
+    
+    for (const suit of suits) {
+      for (const rank of ranks) {
+        newDeck.push({
+          id: `card-${idCounter++}`,
+          suit,
+          rank,
+        });
+      }
+    }
+    
+    // Shuffle the deck
+    for (let i = newDeck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
+    }
+    
+    setDeck(newDeck);
+  };
 
   return (
     <div className={styles.container}>
@@ -133,6 +167,31 @@ export function GameStoreDebug() {
           <p className={styles.paragraph}>
             🗑️ Discard Pile: <strong>{discardPile.length}</strong>
           </p>
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={initializeDeck}>
+              Initialize Deck
+            </button>
+            <button className={styles.button} onClick={() => drawHand(8)} disabled={deck.length === 0}>
+              Draw Hand
+            </button>
+          </div>
+        </section>
+
+        {/* Hand Management */}
+        <section>
+          <h3 className={styles.sectionTitle}>Hand Management</h3>
+          <p className={styles.paragraph}>
+            ✅ Selected: <strong>{selectedCardsCount}</strong> / 5
+          </p>
+          <div className={styles.buttonGroup}>
+            <button 
+              className={styles.button} 
+              onClick={discardHand} 
+              disabled={!canDiscardHand}
+            >
+              Discard Selected ({selectedCardsCount})
+            </button>
+          </div>
         </section>
 
         {/* Actions */}
@@ -143,6 +202,32 @@ export function GameStoreDebug() {
           </button>
         </section>
       </div>
+
+      {/* Current Hand Display */}
+      {currentHand.length > 0 && (
+        <div className={styles.handSection}>
+          <h3 className={styles.sectionTitle}>Current Hand (Click to Select/Deselect)</h3>
+          <div className={styles.cardGrid}>
+            {currentHand.map((card) => (
+              <button
+                key={card.id}
+                className={`${styles.card} ${card.selected ? styles.cardSelected : ""}`}
+                onClick={() => selectCard(card.id)}
+              >
+                <div className={styles.cardContent}>
+                  <span className={styles.cardRank}>{card.rank}</span>
+                  <span className={styles.cardSuit}>
+                    {card.suit === "hearts" && "♥"}
+                    {card.suit === "diamonds" && "♦"}
+                    {card.suit === "clubs" && "♣"}
+                    {card.suit === "spades" && "♠"}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className={styles.tip}>
         <p>💡 Tip: Open React DevTools to inspect Zustand store state and actions</p>

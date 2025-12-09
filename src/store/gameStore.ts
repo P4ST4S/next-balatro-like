@@ -61,6 +61,9 @@ interface GameActions {
   // Deck management
   setDeck: (cards: GameState["deck"]) => void;
   drawCards: (count: number) => void;
+  drawHand: (maxHandSize?: number) => void;
+  selectCard: (cardId: string) => void;
+  discardHand: () => void;
   discardCard: (cardId: string) => void;
   resetHand: () => void;
 
@@ -256,6 +259,88 @@ export const useGameStore = create<GameStore>()(
           "drawCards"
         ),
 
+      drawHand: (maxHandSize = 8) =>
+        set(
+          (state) => {
+            const cardsNeeded = maxHandSize - state.currentHand.length;
+            if (cardsNeeded <= 0) return state;
+
+            const cardsToDraw = state.deck.slice(0, cardsNeeded);
+            const remainingDeck = state.deck.slice(cardsNeeded);
+            return {
+              deck: remainingDeck,
+              currentHand: [...state.currentHand, ...cardsToDraw],
+            };
+          },
+          false,
+          "drawHand"
+        ),
+
+      selectCard: (cardId) =>
+        set(
+          (state) => {
+            const card = state.currentHand.find((c) => c.id === cardId);
+            if (!card) return state;
+
+            // If card is already selected, deselect it
+            if (card.selected) {
+              return {
+                currentHand: state.currentHand.map((c) =>
+                  c.id === cardId ? { ...c, selected: false } : c
+                ),
+              };
+            }
+
+            // Count currently selected cards
+            const selectedCount = state.currentHand.filter((c) => c.selected).length;
+
+            // Don't allow more than 5 cards to be selected
+            if (selectedCount >= 5) return state;
+
+            // Select the card
+            return {
+              currentHand: state.currentHand.map((c) =>
+                c.id === cardId ? { ...c, selected: true } : c
+              ),
+            };
+          },
+          false,
+          "selectCard"
+        ),
+
+      discardHand: () =>
+        set(
+          (state) => {
+            // Can't discard if no discards remaining
+            if (state.combat.discardsRemaining <= 0) return state;
+
+            // Get selected cards
+            const selectedCards = state.currentHand.filter((c) => c.selected);
+            if (selectedCards.length === 0) return state;
+
+            // Remove selected cards from hand and add to discard pile (deselecting them)
+            const remainingHand = state.currentHand.filter((c) => !c.selected);
+            const cardsToDiscard = selectedCards.map((c) => ({ ...c, selected: false }));
+
+            // Draw new cards to replenish hand
+            const cardsNeeded = 8 - remainingHand.length;
+            const cardsToDraw = state.deck.slice(0, cardsNeeded);
+            const remainingDeck = state.deck.slice(cardsNeeded);
+
+            return {
+              currentHand: [...remainingHand, ...cardsToDraw],
+              discardPile: [...state.discardPile, ...cardsToDiscard],
+              deck: remainingDeck,
+              combat: {
+                ...state.combat,
+                discardsRemaining: state.combat.discardsRemaining - 1,
+              },
+            };
+          },
+          false,
+          "discardHand"
+        ),
+
       discardCard: (cardId) =>
         set(
           (state) => {
@@ -263,7 +348,7 @@ export const useGameStore = create<GameStore>()(
             if (!card) return state;
             return {
               currentHand: state.currentHand.filter((c) => c.id !== cardId),
-              discardPile: [...state.discardPile, card],
+              discardPile: [...state.discardPile, { ...card, selected: false }],
             };
           },
           false,
@@ -286,6 +371,10 @@ export const selectors = {
   canPlayHand: (state: GameStore) => state.currentHand.length > 0,
   canDiscard: (state: GameStore) =>
     state.combat.discardsRemaining > 0 && state.currentHand.length > 0,
+  canDiscardHand: (state: GameStore) =>
+    state.combat.discardsRemaining > 0 &&
+    state.currentHand.filter((c) => c.selected).length > 0,
+  selectedCardsCount: (state: GameStore) => state.currentHand.filter((c) => c.selected).length,
   hasWon: (state: GameStore) => state.combat.currentScore >= state.combat.targetScore,
   jokerSlots: (state: GameStore) => state.inventory.jokers.length,
   consumableSlots: (state: GameStore) => state.inventory.consumables.length,

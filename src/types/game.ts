@@ -14,6 +14,7 @@ export interface Card {
   id: string;
   suit: Suit;
   rank: Rank;
+  selected?: boolean;
   isEnhanced?: boolean;
   enhancement?: "bonus" | "mult" | "wild" | "glass" | "steel" | "stone";
   edition?: "foil" | "holographic" | "polychrome";
