@@ -45,8 +45,12 @@ pnpm dev
 - `src/app/globals.css` — base resets and typography.
 - `src/store/gameStore.ts` — Zustand store for game state management.
 - `src/types/game.ts` — TypeScript type definitions for game entities.
+- `src/lib/deck.ts` — deck creation and shuffling utilities.
+- `src/lib/pokerEvaluator.ts` — poker hand evaluation logic (the game's brain).
 - `src/app/_components/GameStoreDebug.tsx` — interactive debug panel for testing the store.
 - `docs/STORE_ARCHITECTURE.md` — comprehensive store documentation.
+- `docs/DECK_UTILITIES.md` — deck utilities documentation.
+- `docs/POKER_EVALUATOR.md` — poker hand evaluation documentation.
 
 ## 🎮 Usage
 
