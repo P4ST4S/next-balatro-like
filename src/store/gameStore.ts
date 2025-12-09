@@ -3,6 +3,8 @@ import { devtools } from "zustand/middleware";
 import type { GameState } from "@/types/game";
 import { evaluatePokerHand } from "@/lib/pokerEvaluator";
 import { calculateScore } from "@/lib/scoringEngine";
+import { getBlindConfig } from "@/lib/blindConfig";
+import { createShuffledDeck } from "@/lib/deck";
 
 /**
  * Game constants
@@ -14,7 +16,7 @@ const MAX_CARDS_SELECTED = 5;
  * Initial game state with default values
  * - Starting money: $4 (standard Balatro starting amount)
  * - Ante 1, Round 1, Small Blind (beginning of run)
- * - 3 discards and target score of 300 for first blind
+ * - 4 hands, 3 discards and target score of 300 for first blind
  */
 const initialState: GameState = {
   phase: "MENU",
@@ -26,6 +28,7 @@ const initialState: GameState = {
   },
   combat: {
     handsPlayed: 0,
+    handsRemaining: 4,
     discardsRemaining: 3,
     currentScore: 0,
     targetScore: 300,
@@ -59,6 +62,8 @@ interface GameActions {
   useDiscard: () => void;
   addScore: (points: number) => void;
   resetCombat: () => void;
+  startRound: () => void;
+  checkRoundEnd: () => void;
 
   // Inventory management
   addJoker: (joker: GameState["inventory"]["jokers"][number]) => void;
@@ -155,9 +160,15 @@ export const useGameStore = create<GameStore>()(
       updateCombat: (updates) =>
         set((state) => ({ combat: { ...state.combat, ...updates } }), false, "updateCombat"),
 
-      playHand: () =>
+      playHand: () => {
+        // First, update the game state with the hand play
         set(
           (state) => {
+            // Can't play if no hands remaining
+            if (state.combat.handsRemaining <= 0) {
+              return state;
+            }
+
             // Get selected cards from current hand
             const selectedCards = state.currentHand.filter((c) => c.selected);
             
@@ -189,6 +200,7 @@ export const useGameStore = create<GameStore>()(
               combat: {
                 ...state.combat,
                 handsPlayed: state.combat.handsPlayed + 1,
+                handsRemaining: state.combat.handsRemaining - 1,
                 currentScore: state.combat.currentScore + scoreResult.finalScore,
               },
               currentHand: [...remainingHand, ...cardsToDraw],
@@ -198,7 +210,14 @@ export const useGameStore = create<GameStore>()(
           },
           false,
           "playHand"
-        ),
+        );
+
+        // Then check if the round has ended
+        // We need to use setTimeout to ensure the state update has completed
+        setTimeout(() => {
+          useGameStore.getState().checkRoundEnd();
+        }, 0);
+      },
 
       useDiscard: () =>
         set(
@@ -231,6 +250,7 @@ export const useGameStore = create<GameStore>()(
           {
             combat: {
               handsPlayed: 0,
+              handsRemaining: 4,
               discardsRemaining: 3,
               currentScore: 0,
               targetScore: 300,
@@ -238,6 +258,98 @@ export const useGameStore = create<GameStore>()(
           },
           false,
           "resetCombat"
+        ),
+
+      startRound: () =>
+        set(
+          (state) => {
+            // Get blind configuration for current blind and ante
+            const blindConfig = getBlindConfig(state.run.currentBlind, state.run.ante);
+
+            // Create a new shuffled deck
+            const newDeck = createShuffledDeck();
+
+            // Draw initial hand
+            const initialHand = newDeck.slice(0, MAX_HAND_SIZE);
+            const remainingDeck = newDeck.slice(MAX_HAND_SIZE);
+
+            return {
+              phase: "PLAYING_HAND" as const,
+              combat: {
+                handsPlayed: 0,
+                handsRemaining: blindConfig.hands,
+                discardsRemaining: blindConfig.discards,
+                currentScore: 0,
+                targetScore: blindConfig.targetScore,
+              },
+              deck: remainingDeck,
+              currentHand: initialHand,
+              discardPile: [],
+            };
+          },
+          false,
+          "startRound"
+        ),
+
+      checkRoundEnd: () =>
+        set(
+          (state) => {
+            // Only check if we're in playing phase
+            if (state.phase !== "PLAYING_HAND") {
+              return state;
+            }
+
+            const hasWon = state.combat.currentScore >= state.combat.targetScore;
+            const hasLost = state.combat.handsRemaining === 0 && !hasWon;
+
+            // If player has won the blind
+            if (hasWon) {
+              const blindConfig = getBlindConfig(state.run.currentBlind, state.run.ante);
+              
+              // Award money
+              const newMoney = state.run.money + blindConfig.rewardMoney;
+
+              // Move to next blind
+              const blindOrder: Array<GameState["run"]["currentBlind"]> = ["small", "big", "boss"];
+              const currentIndex = blindOrder.indexOf(state.run.currentBlind);
+              const nextBlind = blindOrder[currentIndex + 1];
+
+              if (nextBlind) {
+                // Move to next blind, transition to shop
+                return {
+                  phase: "SHOP" as const,
+                  run: {
+                    ...state.run,
+                    money: newMoney,
+                    currentBlind: nextBlind,
+                  },
+                };
+              } else {
+                // Boss was completed, move to next ante
+                return {
+                  phase: "SHOP" as const,
+                  run: {
+                    ...state.run,
+                    money: newMoney,
+                    ante: state.run.ante + 1,
+                    currentBlind: "small",
+                  },
+                };
+              }
+            }
+
+            // If player has lost (no hands remaining and didn't reach target)
+            if (hasLost) {
+              return {
+                phase: "GAME_OVER" as const,
+              };
+            }
+
+            // No end condition met yet
+            return state;
+          },
+          false,
+          "checkRoundEnd"
         ),
 
       // Inventory management
@@ -413,6 +525,7 @@ export const useGameStore = create<GameStore>()(
  */
 export const selectors = {
   canPlayHand: (state: GameStore) => 
+    state.combat.handsRemaining > 0 &&
     state.currentHand.filter((c) => c.selected).length === 5,
   canDiscard: (state: GameStore) =>
     state.combat.discardsRemaining > 0 && state.currentHand.length > 0,
@@ -421,6 +534,9 @@ export const selectors = {
     state.currentHand.filter((c) => c.selected).length > 0,
   selectedCardsCount: (state: GameStore) => state.currentHand.filter((c) => c.selected).length,
   hasWon: (state: GameStore) => state.combat.currentScore >= state.combat.targetScore,
+  hasLost: (state: GameStore) => 
+    state.combat.handsRemaining === 0 && 
+    state.combat.currentScore < state.combat.targetScore,
   jokerSlots: (state: GameStore) => state.inventory.jokers.length,
   consumableSlots: (state: GameStore) => state.inventory.consumables.length,
 };

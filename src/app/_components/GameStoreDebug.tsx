@@ -34,12 +34,15 @@ export function GameStoreDebug() {
   const discardHand = useGameStore((state) => state.discardHand);
   const addJoker = useGameStore((state) => state.addJoker);
   const removeJoker = useGameStore((state) => state.removeJoker);
+  const startRound = useGameStore((state) => state.startRound);
+  const checkRoundEnd = useGameStore((state) => state.checkRoundEnd);
 
   const canPlayHand = useGameStore(selectors.canPlayHand);
   const canDiscard = useGameStore(selectors.canDiscard);
   const canDiscardHand = useGameStore(selectors.canDiscardHand);
   const selectedCardsCount = useGameStore(selectors.selectedCardsCount);
   const hasWon = useGameStore(selectors.hasWon);
+  const hasLost = useGameStore(selectors.hasLost);
 
   // Initialize a test deck
   const initializeDeck = () => {
@@ -141,7 +144,7 @@ export function GameStoreDebug() {
         <section>
           <h3 className={styles.sectionTitle}>Combat State</h3>
           <p className={styles.paragraph}>
-            🃏 Hands Played: <strong>{combat.handsPlayed}</strong>
+            🃏 Hands: <strong>{combat.handsPlayed}</strong> played / <strong>{combat.handsRemaining}</strong> remaining
           </p>
           <p className={styles.paragraph}>
             🗑️ Discards Left: <strong>{combat.discardsRemaining}</strong>
@@ -149,7 +152,9 @@ export function GameStoreDebug() {
           <p className={styles.paragraph}>
             📈 Score: <strong>{combat.currentScore}</strong> / {combat.targetScore}
           </p>
-          <p className={styles.paragraph}>Status: {hasWon ? "🎉 Won!" : "🎯 In Progress"}</p>
+          <p className={styles.paragraph}>
+            Status: {hasWon ? "🎉 Won!" : hasLost ? "💀 Lost!" : "🎯 In Progress"}
+          </p>
           <div className={styles.buttonGroup}>
             <button className={styles.button} onClick={playHand} disabled={!canPlayHand}>
               Play Hand
@@ -159,6 +164,14 @@ export function GameStoreDebug() {
             </button>
             <button className={styles.button} onClick={() => addScore(100)}>
               +100 Score
+            </button>
+          </div>
+          <div className={styles.buttonGroup} style={{ marginTop: '0.5rem' }}>
+            <button className={styles.button} onClick={startRound}>
+              🎬 Start Round
+            </button>
+            <button className={styles.button} onClick={checkRoundEnd}>
+              🏁 Check Round End
             </button>
           </div>
         </section>
