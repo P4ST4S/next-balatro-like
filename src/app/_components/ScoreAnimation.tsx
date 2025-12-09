@@ -163,7 +163,7 @@ export function ScoreAnimation({ chips, mult, finalScore, onComplete }: ScoreAni
             }}
             transition={{
               duration: 1.5,
-              repeat: Infinity,
+              repeat: phase === "complete" ? 2 : 0,
               repeatType: "reverse",
             }}
           >

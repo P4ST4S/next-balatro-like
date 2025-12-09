@@ -147,6 +147,15 @@ function checkStraight(cards: Card[]): Card[] | null {
  * Evaluates a poker hand and returns the hand type and scoring cards
  * According to Balatro rules, only the cards that form the hand are scoring cards
  *
+ * Note: Straights and Straight Flushes require exactly 5 cards to be detected.
+ * With fewer than 5 cards, the best possible hand types are:
+ * - Four of a Kind (4 cards)
+ * - Three of a Kind (3 cards)
+ * - Two Pair (4 cards)
+ * - Pair (2 cards)
+ * - High Card (1 card)
+ * - Flush (1-5 cards of same suit)
+ *
  * @param cards - Array of 1-5 cards to evaluate (the played hand)
  * @returns Object containing the hand type and array of scoring cards
  *
@@ -179,7 +188,7 @@ export function evaluatePokerHand(cards: Card[]): PokerHandResult {
   if (isStraight && isFlush) {
     return {
       handType: "Straight Flush",
-      scoringCards: cards, // All 5 cards score in a straight flush
+      scoringCards: cards, // All cards score in a straight flush
     };
   }
 
@@ -206,7 +215,7 @@ export function evaluatePokerHand(cards: Card[]): PokerHandResult {
   if (isFlush) {
     return {
       handType: "Flush",
-      scoringCards: cards, // All 5 cards score in a flush
+      scoringCards: cards, // All cards score in a flush
     };
   }
 
@@ -214,7 +223,7 @@ export function evaluatePokerHand(cards: Card[]): PokerHandResult {
   if (isStraight) {
     return {
       handType: "Straight",
-      scoringCards: straightCards, // All 5 cards score in a straight
+      scoringCards: straightCards, // All cards score in a straight
     };
   }
 
