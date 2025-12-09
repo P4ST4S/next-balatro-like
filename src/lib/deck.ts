@@ -30,7 +30,7 @@ export const RANKS: readonly Rank[] = [
  *
  * @returns A UUID v4 string
  */
-function generateUUID(): string {
+export function generateUUID(): string {
   // Use crypto.randomUUID() if available (modern browsers and Node.js 19+)
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();

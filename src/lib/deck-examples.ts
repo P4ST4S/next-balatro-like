@@ -3,6 +3,10 @@
  *
  * This file demonstrates how to integrate the deck functions
  * with the game store and state management.
+ *
+ * NOTE: These are example/demonstration functions showing integration patterns.
+ * In production code, you may want to pass store methods as parameters
+ * or use these patterns directly in your components/actions.
  */
 
 import { createShuffledDeck } from "@/lib/deck";

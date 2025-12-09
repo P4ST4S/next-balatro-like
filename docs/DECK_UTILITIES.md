@@ -35,6 +35,25 @@ Array of all valid card ranks in a standard deck, ordered from lowest to highest
 
 ### Functions
 
+#### `generateUUID()`
+
+Generates a UUID v4 compatible with both browser and Node.js environments.
+
+**Returns:** `string` - A UUID v4 string
+
+**Example:**
+```typescript
+import { generateUUID } from "@/lib/deck";
+
+const id = generateUUID();
+console.log(id); // "550e8400-e29b-41d4-a716-446655440000"
+```
+
+**Implementation Details:**
+- Uses `crypto.randomUUID()` when available (modern browsers and Node.js 19+)
+- Falls back to `Math.random()` for compatibility with older environments
+- No external dependencies required
+
 #### `createDeck()`
 
 Creates a standard 52-card deck.
