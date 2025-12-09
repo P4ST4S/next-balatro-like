@@ -169,8 +169,12 @@ export const useGameStore = create<GameStore>()(
             // Evaluate the poker hand
             const handResult = evaluatePokerHand(selectedCards);
             
-            // Calculate the score
-            const scoreResult = calculateScore(handResult.scoringCards, handResult.handType);
+            // Calculate the score with jokers
+            const scoreResult = calculateScore(
+              handResult.scoringCards, 
+              handResult.handType,
+              state.inventory.jokers
+            );
             
             // Move selected cards to discard pile (deselect them first)
             const cardsToDiscard = selectedCards.map((c) => ({ ...c, selected: false }));

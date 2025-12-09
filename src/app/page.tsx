@@ -1,5 +1,5 @@
 import styles from "./page.module.css";
-import { GameStoreDebug } from "./_components/GameStoreDebug";
+import Link from "next/link";
 
 type Feature = {
   title: string;
@@ -106,9 +106,9 @@ export default function Home() {
               Every shuffle is a bet against the house.
             </p>
             <div className={styles.actions}>
-              <a className={styles.primary} href="#">
+              <Link className={styles.primary} href="/game">
                 Play the demo
-              </a>
+              </Link>
               <a className={styles.secondary} href="#">
                 Watch a run
               </a>
@@ -228,11 +228,6 @@ export default function Home() {
               </article>
             ))}
           </div>
-        </section>
-
-        {/* Game Store Debug Panel */}
-        <section className={styles.section}>
-          <GameStoreDebug />
         </section>
       </main>
     </div>
