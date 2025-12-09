@@ -1,0 +1,51 @@
+.card {
+  background-color: #fff;
+  border: 3px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  min-height: 120px;
+  min-width: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: border-color 0.2s;
+  position: relative;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.cardSelected {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5);
+}
+
+.cardRed {
+  color: #dc2626;
+}
+
+.cardBlack {
+  color: #1f2937;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.cardRank {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.cardSuit {
+  font-size: 32px;
+  line-height: 1;
+}
