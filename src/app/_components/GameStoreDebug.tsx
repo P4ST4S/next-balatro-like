@@ -1,6 +1,7 @@
 "use client";
 
 import { useGameStore, selectors } from "@/store/gameStore";
+import styles from "./GameStoreDebug.module.css";
 
 /**
  * Debug component to visualize and interact with the game store
@@ -29,165 +30,123 @@ export function GameStoreDebug() {
   const hasWon = useGameStore(selectors.hasWon);
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        backgroundColor: "#1a1a1a",
-        color: "#fff",
-        fontFamily: "monospace",
-        borderRadius: "8px",
-        margin: "20px",
-      }}
-    >
-      <h2 style={{ marginBottom: "20px", color: "#4ade80" }}>🎮 Game Store Debug</h2>
+    <div className={styles.container}>
+      <h2 className={styles.title}>🎮 Game Store Debug</h2>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "20px",
-        }}
-      >
+      <div className={styles.grid}>
         {/* Phase */}
         <section>
-          <h3 style={{ color: "#60a5fa", marginBottom: "10px" }}>Phase</h3>
-          <p style={{ marginBottom: "10px" }}>
+          <h3 className={styles.sectionTitle}>Phase</h3>
+          <p className={styles.paragraph}>
             Current: <strong>{phase}</strong>
           </p>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            <button onClick={() => setPhase("MENU")}>Menu</button>
-            <button onClick={() => setPhase("PLAYING_HAND")}>Playing</button>
-            <button onClick={() => setPhase("SHOP")}>Shop</button>
-            <button onClick={() => setPhase("GAME_OVER")}>Game Over</button>
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={() => setPhase("MENU")}>
+              Menu
+            </button>
+            <button className={styles.button} onClick={() => setPhase("PLAYING_HAND")}>
+              Playing
+            </button>
+            <button className={styles.button} onClick={() => setPhase("SHOP")}>
+              Shop
+            </button>
+            <button className={styles.button} onClick={() => setPhase("GAME_OVER")}>
+              Game Over
+            </button>
           </div>
         </section>
 
         {/* Run State */}
         <section>
-          <h3 style={{ color: "#60a5fa", marginBottom: "10px" }}>Run State</h3>
-          <p>
+          <h3 className={styles.sectionTitle}>Run State</h3>
+          <p className={styles.paragraph}>
             💰 Money: <strong>${run.money}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             📊 Ante: <strong>{run.ante}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             🎯 Blind: <strong>{run.currentBlind}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             🔄 Round: <strong>{run.currentRound}</strong>
           </p>
-          <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
-            <button onClick={() => addMoney(5)}>+$5</button>
-            <button onClick={() => spendMoney(3)}>-$3</button>
-            <button onClick={nextBlind}>Next Blind</button>
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={() => addMoney(5)}>
+              +$5
+            </button>
+            <button className={styles.button} onClick={() => spendMoney(3)}>
+              -$3
+            </button>
+            <button className={styles.button} onClick={nextBlind}>
+              Next Blind
+            </button>
           </div>
         </section>
 
         {/* Combat State */}
         <section>
-          <h3 style={{ color: "#60a5fa", marginBottom: "10px" }}>Combat State</h3>
-          <p>
+          <h3 className={styles.sectionTitle}>Combat State</h3>
+          <p className={styles.paragraph}>
             🃏 Hands Played: <strong>{combat.handsPlayed}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             🗑️ Discards Left: <strong>{combat.discardsRemaining}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             📈 Score: <strong>{combat.currentScore}</strong> / {combat.targetScore}
           </p>
-          <p>Status: {hasWon ? "🎉 Won!" : "🎯 In Progress"}</p>
-          <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
-            <button onClick={playHand} disabled={!canPlayHand}>
+          <p className={styles.paragraph}>Status: {hasWon ? "🎉 Won!" : "🎯 In Progress"}</p>
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={playHand} disabled={!canPlayHand}>
               Play Hand
             </button>
-            <button onClick={useDiscard} disabled={!canDiscard}>
+            <button className={styles.button} onClick={useDiscard} disabled={!canDiscard}>
               Use Discard
             </button>
-            <button onClick={() => addScore(100)}>+100 Score</button>
+            <button className={styles.button} onClick={() => addScore(100)}>
+              +100 Score
+            </button>
           </div>
         </section>
 
         {/* Inventory */}
         <section>
-          <h3 style={{ color: "#60a5fa", marginBottom: "10px" }}>Inventory</h3>
-          <p>
+          <h3 className={styles.sectionTitle}>Inventory</h3>
+          <p className={styles.paragraph}>
             🃏 Jokers: <strong>{inventory.jokers.length}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             ✨ Consumables: <strong>{inventory.consumables.length}</strong>
           </p>
         </section>
 
         {/* Deck Info */}
         <section>
-          <h3 style={{ color: "#60a5fa", marginBottom: "10px" }}>Deck</h3>
-          <p>
+          <h3 className={styles.sectionTitle}>Deck</h3>
+          <p className={styles.paragraph}>
             📚 Cards in Deck: <strong>{deck.length}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             🖐️ Current Hand: <strong>{currentHand.length}</strong>
           </p>
-          <p>
+          <p className={styles.paragraph}>
             🗑️ Discard Pile: <strong>{discardPile.length}</strong>
           </p>
         </section>
 
         {/* Actions */}
         <section>
-          <h3 style={{ color: "#60a5fa", marginBottom: "10px" }}>Actions</h3>
-          <button
-            onClick={resetGame}
-            style={{
-              backgroundColor: "#ef4444",
-              color: "white",
-              padding: "8px 16px",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
+          <h3 className={styles.sectionTitle}>Actions</h3>
+          <button className={styles.resetButton} onClick={resetGame}>
             🔄 Reset Game
           </button>
         </section>
       </div>
 
-      <div
-        style={{
-          marginTop: "20px",
-          padding: "10px",
-          backgroundColor: "#2a2a2a",
-          borderRadius: "4px",
-        }}
-      >
-        <p style={{ fontSize: "12px", color: "#888" }}>
-          💡 Tip: Open React DevTools to inspect Zustand store state and actions
-        </p>
+      <div className={styles.tip}>
+        <p>💡 Tip: Open React DevTools to inspect Zustand store state and actions</p>
       </div>
-
-      <style jsx>{`
-        button {
-          background-color: #3b82f6;
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          transition: background-color 0.2s;
-        }
-        button:hover:not(:disabled) {
-          background-color: #2563eb;
-        }
-        button:disabled {
-          background-color: #4b5563;
-          cursor: not-allowed;
-          opacity: 0.5;
-        }
-        p {
-          margin: 4px 0;
-        }
-      `}</style>
     </div>
   );
 }

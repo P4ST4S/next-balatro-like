@@ -4,6 +4,9 @@ import type { GameState } from "@/types/game";
 
 /**
  * Initial game state with default values
+ * - Starting money: $4 (standard Balatro starting amount)
+ * - Ante 1, Round 1, Small Blind (beginning of run)
+ * - 3 discards and target score of 300 for first blind
  */
 const initialState: GameState = {
   phase: "MENU",
@@ -38,7 +41,7 @@ interface GameActions {
   // Run management
   updateRun: (updates: Partial<GameState["run"]>) => void;
   addMoney: (amount: number) => void;
-  spendMoney: (amount: number) => boolean;
+  spendMoney: (amount: number) => void;
   nextBlind: () => void;
   nextAnte: () => void;
 
@@ -76,7 +79,7 @@ type GameStore = GameState & GameActions;
  */
 export const useGameStore = create<GameStore>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
 
       // Phase management
@@ -93,18 +96,17 @@ export const useGameStore = create<GameStore>()(
           "addMoney"
         ),
 
-      spendMoney: (amount) => {
-        const { run } = get();
-        if (run.money >= amount) {
-          set(
-            (state) => ({ run: { ...state.run, money: state.run.money - amount } }),
-            false,
-            "spendMoney"
-          );
-          return true;
-        }
-        return false;
-      },
+      spendMoney: (amount) =>
+        set(
+          (state) => {
+            if (state.run.money >= amount) {
+              return { run: { ...state.run, money: state.run.money - amount } };
+            }
+            return state;
+          },
+          false,
+          "spendMoney"
+        ),
 
       nextBlind: () =>
         set(
