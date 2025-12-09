@@ -99,6 +99,22 @@ export interface InventoryState {
 }
 
 /**
+ * Shop item with pricing
+ */
+export interface ShopItem {
+  joker: Joker;
+  price: number;
+}
+
+/**
+ * Shop state
+ */
+export interface ShopState {
+  items: ShopItem[];
+  rerollCost: number;
+}
+
+/**
  * Complete game state
  */
 export interface GameState {
@@ -106,6 +122,7 @@ export interface GameState {
   run: RunState;
   combat: CombatState;
   inventory: InventoryState;
+  shop: ShopState;
   deck: Card[];
   currentHand: Card[];
   discardPile: Card[];
