@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import type { GameState } from "@/types/game";
 import { evaluatePokerHand } from "@/lib/pokerEvaluator";
 import { calculateScore } from "@/lib/scoringEngine";
@@ -102,17 +102,18 @@ type GameStore = GameState & GameActions;
 
 /**
  * Main game store using Zustand
- * Includes devtools middleware for debugging
+ * Includes persist middleware for localStorage and devtools middleware for debugging
  */
 export const useGameStore = create<GameStore>()(
-  devtools(
-    (set) => ({
-      ...initialState,
+  persist(
+    devtools(
+      (set) => ({
+        ...initialState,
 
-      // Phase management
-      setPhase: (phase) => set({ phase }, false, "setPhase"),
+        // Phase management
+        setPhase: (phase) => set({ phase }, false, "setPhase"),
 
-      // Run management
+        // Run management
       updateRun: (updates) =>
         set((state) => ({ run: { ...state.run, ...updates } }), false, "updateRun"),
 
@@ -695,7 +696,22 @@ export const useGameStore = create<GameStore>()(
       // Game reset
       resetGame: () => set(initialState, false, "resetGame"),
     }),
-    { name: "GameStore" }
+      { name: "GameStore" }
+    ),
+    {
+      name: "balatro-like-game-state",
+      // Only persist the actual game state, not the action methods
+      partialize: (state) => ({
+        phase: state.phase,
+        run: state.run,
+        combat: state.combat,
+        inventory: state.inventory,
+        shop: state.shop,
+        deck: state.deck,
+        currentHand: state.currentHand,
+        discardPile: state.discardPile,
+      }),
+    }
   )
 );
 
