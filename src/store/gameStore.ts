@@ -5,6 +5,7 @@ import { evaluatePokerHand } from "@/lib/pokerEvaluator";
 import { calculateScore } from "@/lib/scoringEngine";
 import { getBlindConfig } from "@/lib/blindConfig";
 import { createShuffledDeck } from "@/lib/deck";
+import { generateShopItems, SHOP_CONFIG } from "@/lib/shop";
 
 /**
  * Game constants
@@ -36,6 +37,10 @@ const initialState: GameState = {
   inventory: {
     jokers: [],
     consumables: [],
+  },
+  shop: {
+    items: [],
+    rerollCost: SHOP_CONFIG.baseRerollCost,
   },
   deck: [],
   currentHand: [],
@@ -70,6 +75,12 @@ interface GameActions {
   removeJoker: (jokerId: string) => void;
   addConsumable: (consumable: GameState["inventory"]["consumables"][number]) => void;
   removeConsumable: (consumableId: string) => void;
+
+  // Shop management
+  initializeShop: () => void;
+  buyJoker: (jokerIndex: number) => void;
+  rerollShop: () => void;
+  leaveShop: () => void;
 
   // Deck management
   setDeck: (cards: GameState["deck"]) => void;
@@ -227,6 +238,10 @@ export const useGameStore = create<GameStore>()(
                     handsRemaining: newHandsRemaining,
                     currentScore: newScore,
                   },
+                  shop: {
+                    items: generateShopItems(),
+                    rerollCost: SHOP_CONFIG.baseRerollCost,
+                  },
                   currentHand: [...remainingHand, ...cardsToDraw],
                   discardPile: [...state.discardPile, ...cardsToDiscard],
                   deck: remainingDeck,
@@ -246,6 +261,10 @@ export const useGameStore = create<GameStore>()(
                     handsPlayed: state.combat.handsPlayed + 1,
                     handsRemaining: newHandsRemaining,
                     currentScore: newScore,
+                  },
+                  shop: {
+                    items: generateShopItems(),
+                    rerollCost: SHOP_CONFIG.baseRerollCost,
                   },
                   currentHand: [...remainingHand, ...cardsToDraw],
                   discardPile: [...state.discardPile, ...cardsToDiscard],
@@ -392,6 +411,10 @@ export const useGameStore = create<GameStore>()(
                     money: newMoney,
                     currentBlind: nextBlind,
                   },
+                  shop: {
+                    items: generateShopItems(),
+                    rerollCost: SHOP_CONFIG.baseRerollCost,
+                  },
                 };
               } else {
                 // Boss was completed, move to next ante
@@ -402,6 +425,10 @@ export const useGameStore = create<GameStore>()(
                     money: newMoney,
                     ante: state.run.ante + 1,
                     currentBlind: "small",
+                  },
+                  shop: {
+                    items: generateShopItems(),
+                    rerollCost: SHOP_CONFIG.baseRerollCost,
                   },
                 };
               }
@@ -465,6 +492,92 @@ export const useGameStore = create<GameStore>()(
           }),
           false,
           "removeConsumable"
+        ),
+
+      // Shop management
+      initializeShop: () =>
+        set(
+          {
+            shop: {
+              items: generateShopItems(),
+              rerollCost: SHOP_CONFIG.baseRerollCost,
+            },
+          },
+          false,
+          "initializeShop"
+        ),
+
+      buyJoker: (jokerIndex) =>
+        set(
+          (state) => {
+            const shopItem = state.shop.items[jokerIndex];
+            
+            // Validate the purchase
+            if (!shopItem) return state;
+            if (state.run.money < shopItem.price) return state;
+            if (state.inventory.jokers.length >= SHOP_CONFIG.maxJokerSlots) return state;
+            
+            // Check if player already owns this joker (by id)
+            if (state.inventory.jokers.some(j => j.id === shopItem.joker.id)) return state;
+            
+            // Create a unique instance of the joker for the player's inventory
+            const jokerInstance = {
+              ...shopItem.joker,
+              id: `${shopItem.joker.id}-${Date.now()}`, // Make it unique
+            };
+            
+            // Deduct money and add joker to inventory
+            return {
+              run: {
+                ...state.run,
+                money: state.run.money - shopItem.price,
+              },
+              inventory: {
+                ...state.inventory,
+                jokers: [...state.inventory.jokers, jokerInstance],
+              },
+              shop: {
+                ...state.shop,
+                items: state.shop.items.filter((_, idx) => idx !== jokerIndex),
+              },
+            };
+          },
+          false,
+          "buyJoker"
+        ),
+
+      rerollShop: () =>
+        set(
+          (state) => {
+            // Check if player can afford reroll
+            if (state.run.money < state.shop.rerollCost) return state;
+            
+            return {
+              run: {
+                ...state.run,
+                money: state.run.money - state.shop.rerollCost,
+              },
+              shop: {
+                items: generateShopItems(),
+                rerollCost: state.shop.rerollCost,
+              },
+            };
+          },
+          false,
+          "rerollShop"
+        ),
+
+      leaveShop: () =>
+        set(
+          {
+            phase: "PLAYING_HAND" as const,
+            shop: {
+              items: [],
+              rerollCost: SHOP_CONFIG.baseRerollCost,
+            },
+          },
+          false,
+          "leaveShop"
         ),
 
       // Deck management
