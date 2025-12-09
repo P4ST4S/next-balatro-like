@@ -24,6 +24,7 @@ export function Game() {
   const currentHand = useGameStore((state) => state.currentHand);
   const deck = useGameStore((state) => state.deck);
   const discardPile = useGameStore((state) => state.discardPile);
+  const inventory = useGameStore((state) => state.inventory);
 
   const playHand = useGameStore((state) => state.playHand);
   const selectCard = useGameStore((state) => state.selectCard);
@@ -51,7 +52,7 @@ export function Game() {
     const scoreResult = calculateScore(
       handResult.scoringCards,
       handResult.handType,
-      useGameStore.getState().inventory.jokers
+      inventory.jokers
     );
     handEvaluation = {
       handType: handResult.handType,
@@ -66,7 +67,7 @@ export function Game() {
       const scoreResult = calculateScore(
         handResult.scoringCards,
         handResult.handType,
-        useGameStore.getState().inventory.jokers
+        inventory.jokers
       );
 
       setLastScoreResult({
