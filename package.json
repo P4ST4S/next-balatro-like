@@ -6,12 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {
     "next": "16.0.8",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -19,6 +22,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
+    "prettier": "^3.7.4",
     "typescript": "^5"
   }
 }
