@@ -106,12 +106,12 @@ export default function Home() {
               Every shuffle is a bet against the house.
             </p>
             <div className={styles.actions}>
-              <Link className={styles.primary} href="/game">
-                Play the demo
+              <Link className={styles.primary} href="/play">
+                Play Real Game
               </Link>
-              <a className={styles.secondary} href="#">
-                Watch a run
-              </a>
+              <Link className={styles.secondary} href="/game">
+                Debug Mode
+              </Link>
             </div>
             <div className={styles.heroStats}>
               <span>
