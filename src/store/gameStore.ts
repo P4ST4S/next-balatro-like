@@ -14,6 +14,11 @@ const MAX_HAND_SIZE = 8;
 const MAX_CARDS_SELECTED = 5;
 
 /**
+ * LocalStorage key for persisting game state
+ */
+export const STORAGE_KEY = "balatro-like-game-state";
+
+/**
  * Initial game state with default values
  * - Starting money: $4 (standard Balatro starting amount)
  * - Ante 1, Round 1, Small Blind (beginning of run)
@@ -699,8 +704,8 @@ export const useGameStore = create<GameStore>()(
       { name: "GameStore" }
     ),
     {
-      name: "balatro-like-game-state",
-      // Only persist the actual game state, not the action methods
+      name: STORAGE_KEY,
+      // Persist specific state properties, excluding action methods
       partialize: (state) => ({
         phase: state.phase,
         run: state.run,

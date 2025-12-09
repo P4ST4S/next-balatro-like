@@ -1,6 +1,6 @@
 "use client";
 
-import { useGameStore } from "@/store/gameStore";
+import { useGameStore, STORAGE_KEY } from "@/store/gameStore";
 import styles from "./Menu.module.css";
 
 /**
@@ -14,10 +14,12 @@ export function Menu() {
   const run = useGameStore((state) => state.run);
   
   const handleNewRun = () => {
-    // Clear localStorage and reset game state
-    localStorage.removeItem("balatro-like-game-state");
+    // Clear localStorage first
+    localStorage.removeItem(STORAGE_KEY);
+    // Reset to initial state
     resetGame();
-    // Start a new round
+    // Queue startRound to run after reset completes
+    // This ensures the game state is fully reset before starting a new round
     setTimeout(() => startRound(), 0);
   };
 
@@ -28,14 +30,16 @@ export function Menu() {
 
   // Check if there's an existing run (not at initial state)
   // We have an existing run if:
-  // - We're not in the MENU phase (actively playing)
-  // - OR we've progressed in the game (ante > 1, different blind, hands played, or money changed)
+  // - We're not in the MENU phase (actively playing, shopping, or game over)
+  // - OR we've made any progress (hands played, score earned, money changed, etc.)
   const combat = useGameStore((state) => state.combat);
-  const hasExistingRun = phase !== "MENU" || 
-                         run.ante > 1 || 
-                         run.currentBlind !== "small" ||
-                         run.money !== 4 ||
-                         combat.handsPlayed > 0;
+  const hasExistingRun = 
+    phase !== "MENU" || 
+    combat.handsPlayed > 0 ||
+    combat.currentScore > 0 ||
+    run.ante > 1 || 
+    run.currentBlind !== "small" ||
+    run.money !== 4;
 
   return (
     <div className={styles.container}>
