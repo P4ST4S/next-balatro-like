@@ -161,7 +161,6 @@ export const useGameStore = create<GameStore>()(
         set((state) => ({ combat: { ...state.combat, ...updates } }), false, "updateCombat"),
 
       playHand: () => {
-        // First, update the game state with the hand play
         set(
           (state) => {
             // Can't play if no hands remaining
@@ -196,12 +195,88 @@ export const useGameStore = create<GameStore>()(
             const cardsToDraw = state.deck.slice(0, cardsNeeded);
             const remainingDeck = state.deck.slice(cardsNeeded);
 
+            // Calculate new combat state
+            const newHandsRemaining = state.combat.handsRemaining - 1;
+            const newScore = state.combat.currentScore + scoreResult.finalScore;
+
+            // Check for round end conditions after this hand
+            const hasWon = newScore >= state.combat.targetScore;
+            const hasLost = newHandsRemaining === 0 && !hasWon;
+
+            // If player won the blind
+            if (hasWon) {
+              const blindConfig = getBlindConfig(state.run.currentBlind, state.run.ante);
+              const newMoney = state.run.money + blindConfig.rewardMoney;
+
+              // Move to next blind
+              const blindOrder: Array<GameState["run"]["currentBlind"]> = ["small", "big", "boss"];
+              const currentIndex = blindOrder.indexOf(state.run.currentBlind);
+              const nextBlind = blindOrder[currentIndex + 1];
+
+              if (nextBlind) {
+                return {
+                  phase: "SHOP" as const,
+                  run: {
+                    ...state.run,
+                    money: newMoney,
+                    currentBlind: nextBlind,
+                  },
+                  combat: {
+                    ...state.combat,
+                    handsPlayed: state.combat.handsPlayed + 1,
+                    handsRemaining: newHandsRemaining,
+                    currentScore: newScore,
+                  },
+                  currentHand: [...remainingHand, ...cardsToDraw],
+                  discardPile: [...state.discardPile, ...cardsToDiscard],
+                  deck: remainingDeck,
+                };
+              } else {
+                // Boss was completed, move to next ante
+                return {
+                  phase: "SHOP" as const,
+                  run: {
+                    ...state.run,
+                    money: newMoney,
+                    ante: state.run.ante + 1,
+                    currentBlind: "small",
+                  },
+                  combat: {
+                    ...state.combat,
+                    handsPlayed: state.combat.handsPlayed + 1,
+                    handsRemaining: newHandsRemaining,
+                    currentScore: newScore,
+                  },
+                  currentHand: [...remainingHand, ...cardsToDraw],
+                  discardPile: [...state.discardPile, ...cardsToDiscard],
+                  deck: remainingDeck,
+                };
+              }
+            }
+
+            // If player lost (no hands remaining and didn't reach target)
+            if (hasLost) {
+              return {
+                phase: "GAME_OVER" as const,
+                combat: {
+                  ...state.combat,
+                  handsPlayed: state.combat.handsPlayed + 1,
+                  handsRemaining: newHandsRemaining,
+                  currentScore: newScore,
+                },
+                currentHand: [...remainingHand, ...cardsToDraw],
+                discardPile: [...state.discardPile, ...cardsToDiscard],
+                deck: remainingDeck,
+              };
+            }
+
+            // No end condition met, continue playing
             return {
               combat: {
                 ...state.combat,
                 handsPlayed: state.combat.handsPlayed + 1,
-                handsRemaining: state.combat.handsRemaining - 1,
-                currentScore: state.combat.currentScore + scoreResult.finalScore,
+                handsRemaining: newHandsRemaining,
+                currentScore: newScore,
               },
               currentHand: [...remainingHand, ...cardsToDraw],
               discardPile: [...state.discardPile, ...cardsToDiscard],
@@ -211,12 +286,6 @@ export const useGameStore = create<GameStore>()(
           false,
           "playHand"
         );
-
-        // Then check if the round has ended
-        // We need to use setTimeout to ensure the state update has completed
-        setTimeout(() => {
-          useGameStore.getState().checkRoundEnd();
-        }, 0);
       },
 
       useDiscard: () =>

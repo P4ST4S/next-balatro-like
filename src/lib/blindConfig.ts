@@ -68,10 +68,15 @@ export function calculateTargetScore(
  * Gets the complete configuration for a specific blind
  * 
  * @param blindType - The type of blind (small, big, boss)
- * @param ante - The current ante number
+ * @param ante - The current ante number (must be >= 1)
  * @returns Complete blind configuration with scaled target score
+ * @throws Error if ante is less than 1
  */
 export function getBlindConfig(blindType: BlindType, ante: number): BlindConfig {
+  if (ante < 1 || !Number.isInteger(ante)) {
+    throw new Error(`Invalid ante value: ${ante}. Ante must be a positive integer >= 1.`);
+  }
+
   const baseConfig = BASE_BLIND_CONFIGS[blindType];
   
   return {
