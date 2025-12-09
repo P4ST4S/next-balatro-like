@@ -44,6 +44,25 @@ const RANK_VALUES: Record<Rank, number> = {
 };
 
 /**
+ * Reverse lookup map for O(1) value-to-rank conversion
+ */
+const VALUE_TO_RANK: Record<number, Rank> = {
+  2: "2",
+  3: "3",
+  4: "4",
+  5: "5",
+  6: "6",
+  7: "7",
+  8: "8",
+  9: "9",
+  10: "10",
+  11: "J",
+  12: "Q",
+  13: "K",
+  14: "A",
+};
+
+/**
  * Groups cards by rank
  */
 function groupByRank(cards: Card[]): Map<Rank, Card[]> {
@@ -78,8 +97,16 @@ function groupBySuit(cards: Card[]): Map<Card["suit"], Card[]> {
 function checkStraight(cards: Card[]): Card[] | null {
   if (cards.length < 5) return null;
 
+  // Build a map for O(1) rank-to-card lookup
+  const rankToCard = new Map<Rank, Card>();
+  for (const card of cards) {
+    if (!rankToCard.has(card.rank)) {
+      rankToCard.set(card.rank, card);
+    }
+  }
+
   // Get unique ranks and sort by value
-  const uniqueRanks = Array.from(new Set(cards.map((c) => c.rank)));
+  const uniqueRanks = Array.from(rankToCard.keys());
   const sortedValues = uniqueRanks
     .map((rank) => RANK_VALUES[rank])
     .sort((a, b) => a - b);
@@ -91,25 +118,23 @@ function checkStraight(cards: Card[]): Card[] | null {
       const isConsecutive = slice.every((val, idx) => idx === 0 || val === slice[idx - 1] + 1);
 
       if (isConsecutive) {
-        // Return cards in straight order
-        const straightRanks = slice.map(
-          (val) => Object.keys(RANK_VALUES).find((k) => RANK_VALUES[k as Rank] === val) as Rank
-        );
-        return straightRanks.map((rank) => cards.find((c) => c.rank === rank)!);
+        // Return cards in straight order using O(1) lookups
+        const straightRanks = slice.map((val) => VALUE_TO_RANK[val]);
+        return straightRanks.map((rank) => rankToCard.get(rank)!);
       }
     }
   }
 
   // Check for ace-low straight (A-2-3-4-5)
   if (
-    uniqueRanks.includes("A") &&
-    uniqueRanks.includes("2") &&
-    uniqueRanks.includes("3") &&
-    uniqueRanks.includes("4") &&
-    uniqueRanks.includes("5")
+    rankToCard.has("A") &&
+    rankToCard.has("2") &&
+    rankToCard.has("3") &&
+    rankToCard.has("4") &&
+    rankToCard.has("5")
   ) {
     const lowStraightRanks: Rank[] = ["A", "2", "3", "4", "5"];
-    return lowStraightRanks.map((rank) => cards.find((c) => c.rank === rank)!);
+    return lowStraightRanks.map((rank) => rankToCard.get(rank)!);
   }
 
   return null;
