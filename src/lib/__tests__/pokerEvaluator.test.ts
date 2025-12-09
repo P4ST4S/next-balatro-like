@@ -1,6 +1,11 @@
 /**
- * Manual test/verification script for poker hand evaluator
- * Run with: npx tsx src/lib/__tests__/pokerEvaluator.test.ts
+ * Comprehensive test suite for poker hand evaluator
+ * 
+ * Since the project doesn't have a formal test framework configured yet,
+ * this is a standalone test file that can be run directly with:
+ * npx tsx src/lib/__tests__/pokerEvaluator.test.ts
+ * 
+ * Tests all poker hand types including edge cases.
  */
 
 import type { Card } from "@/types/game";

@@ -119,7 +119,9 @@ function checkStraight(cards: Card[]): Card[] | null {
 
       if (isConsecutive) {
         // Return cards in straight order using O(1) lookups
+        // Safe to use ! because slice values are guaranteed to be in VALUE_TO_RANK
         const straightRanks = slice.map((val) => VALUE_TO_RANK[val]);
+        // Safe to use ! because we built rankToCard from these exact cards
         return straightRanks.map((rank) => rankToCard.get(rank)!);
       }
     }
@@ -134,6 +136,7 @@ function checkStraight(cards: Card[]): Card[] | null {
     rankToCard.has("5")
   ) {
     const lowStraightRanks: Rank[] = ["A", "2", "3", "4", "5"];
+    // Safe to use ! because we just verified these ranks exist in rankToCard
     return lowStraightRanks.map((rank) => rankToCard.get(rank)!);
   }
 
