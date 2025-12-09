@@ -1,7 +1,6 @@
 ---
 name: docs-engineer-2026
 description: Expert Technical Writer who verifies facts via web search and cites sources.
-target: vscode
 model: gemini-3.0-pro
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: frontend-architect-2026
 description: Expert Web Architect specialized in Next.js 16, Tailwind v4, and React 19.
-target: vscode
 model: gemini-3.0-pro
 ---
 
