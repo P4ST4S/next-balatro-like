@@ -517,13 +517,10 @@ export const useGameStore = create<GameStore>()(
             if (state.run.money < shopItem.price) return state;
             if (state.inventory.jokers.length >= SHOP_CONFIG.maxJokerSlots) return state;
             
-            // Check if player already owns this joker (by id)
-            if (state.inventory.jokers.some(j => j.id === shopItem.joker.id)) return state;
-            
             // Create a unique instance of the joker for the player's inventory
             const jokerInstance = {
               ...shopItem.joker,
-              id: `${shopItem.joker.id}-${Date.now()}`, // Make it unique
+              id: `${shopItem.joker.id}-${crypto.randomUUID()}`, // Make it unique
             };
             
             // Deduct money and add joker to inventory
