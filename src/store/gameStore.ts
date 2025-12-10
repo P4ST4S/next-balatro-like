@@ -14,6 +14,15 @@ const MAX_HAND_SIZE = 8;
 const MAX_CARDS_SELECTED = 5;
 
 /**
+ * Card sorting constants
+ */
+const SUIT_ORDER = { clubs: 0, diamonds: 1, hearts: 2, spades: 3 };
+const RANK_ORDER: Record<string, number> = {
+  "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
+  "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14,
+};
+
+/**
  * LocalStorage key for persisting game state
  */
 export const STORAGE_KEY = "balatro-like-game-state";
@@ -703,18 +712,12 @@ export const useGameStore = create<GameStore>()(
       sortHandBySuit: () =>
         set(
           (state) => {
-            const suitOrder = { clubs: 0, diamonds: 1, hearts: 2, spades: 3 };
-            const rankOrder: Record<string, number> = {
-              "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
-              "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14,
-            };
-
             const sortedHand = [...state.currentHand].sort((a, b) => {
               // Primary sort: by suit
-              const suitDiff = suitOrder[a.suit] - suitOrder[b.suit];
+              const suitDiff = SUIT_ORDER[a.suit] - SUIT_ORDER[b.suit];
               if (suitDiff !== 0) return suitDiff;
               // Secondary sort: by rank ascending
-              return rankOrder[a.rank] - rankOrder[b.rank];
+              return RANK_ORDER[a.rank] - RANK_ORDER[b.rank];
             });
 
             return { currentHand: sortedHand };
@@ -726,18 +729,12 @@ export const useGameStore = create<GameStore>()(
       sortHandByValue: () =>
         set(
           (state) => {
-            const suitOrder = { clubs: 0, diamonds: 1, hearts: 2, spades: 3 };
-            const rankOrder: Record<string, number> = {
-              "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
-              "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14,
-            };
-
             const sortedHand = [...state.currentHand].sort((a, b) => {
               // Primary sort: by rank descending (high to low)
-              const rankDiff = rankOrder[b.rank] - rankOrder[a.rank];
+              const rankDiff = RANK_ORDER[b.rank] - RANK_ORDER[a.rank];
               if (rankDiff !== 0) return rankDiff;
               // Secondary sort: by suit
-              return suitOrder[a.suit] - suitOrder[b.suit];
+              return SUIT_ORDER[a.suit] - SUIT_ORDER[b.suit];
             });
 
             return { currentHand: sortedHand };
