@@ -29,6 +29,8 @@ export function Game() {
   const discardHand = useGameStore((state) => state.discardHand);
   const resetGame = useGameStore((state) => state.resetGame);
   const startRound = useGameStore((state) => state.startRound);
+  const sortHandBySuit = useGameStore((state) => state.sortHandBySuit);
+  const sortHandByValue = useGameStore((state) => state.sortHandByValue);
 
   const canPlayHand = useGameStore(selectors.canPlayHand);
   const canDiscardHand = useGameStore(selectors.canDiscardHand);
@@ -189,6 +191,26 @@ export function Game() {
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Sort Buttons */}
+      {currentHand.length > 0 && (
+        <div className={styles.sortButtons}>
+          <button
+            className={styles.sortButton}
+            onClick={sortHandBySuit}
+            title="Sort by Suit (Clubs, Diamonds, Hearts, Spades)"
+          >
+            ♣️ Sort by Suit
+          </button>
+          <button
+            className={styles.sortButton}
+            onClick={sortHandByValue}
+            title="Sort by Value (Descending: A, K, Q, J...)"
+          >
+            A⬇️ Sort by Value
+          </button>
         </div>
       )}
 

@@ -95,6 +95,8 @@ interface GameActions {
   discardHand: () => void;
   discardCard: (cardId: string) => void;
   resetHand: () => void;
+  sortHandBySuit: () => void;
+  sortHandByValue: () => void;
 
   // Game reset
   resetGame: () => void;
@@ -697,6 +699,52 @@ export const useGameStore = create<GameStore>()(
         ),
 
       resetHand: () => set({ currentHand: [], discardPile: [] }, false, "resetHand"),
+
+      sortHandBySuit: () =>
+        set(
+          (state) => {
+            const suitOrder = { clubs: 0, diamonds: 1, hearts: 2, spades: 3 };
+            const rankOrder: Record<string, number> = {
+              "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
+              "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14,
+            };
+
+            const sortedHand = [...state.currentHand].sort((a, b) => {
+              // Primary sort: by suit
+              const suitDiff = suitOrder[a.suit] - suitOrder[b.suit];
+              if (suitDiff !== 0) return suitDiff;
+              // Secondary sort: by rank ascending
+              return rankOrder[a.rank] - rankOrder[b.rank];
+            });
+
+            return { currentHand: sortedHand };
+          },
+          false,
+          "sortHandBySuit"
+        ),
+
+      sortHandByValue: () =>
+        set(
+          (state) => {
+            const suitOrder = { clubs: 0, diamonds: 1, hearts: 2, spades: 3 };
+            const rankOrder: Record<string, number> = {
+              "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
+              "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14,
+            };
+
+            const sortedHand = [...state.currentHand].sort((a, b) => {
+              // Primary sort: by rank descending (high to low)
+              const rankDiff = rankOrder[b.rank] - rankOrder[a.rank];
+              if (rankDiff !== 0) return rankDiff;
+              // Secondary sort: by suit
+              return suitOrder[a.suit] - suitOrder[b.suit];
+            });
+
+            return { currentHand: sortedHand };
+          },
+          false,
+          "sortHandByValue"
+        ),
 
       // Game reset
       resetGame: () => set(initialState, false, "resetGame"),
