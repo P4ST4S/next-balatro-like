@@ -94,7 +94,12 @@ export function Game() {
   // Auto-scroll when score animation appears
   useEffect(() => {
     if (showScoreAnimation && handSectionRef.current) {
-      handSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      try {
+        handSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (error) {
+        // Silently handle scroll errors
+        console.debug("Scroll error:", error);
+      }
     }
   }, [showScoreAnimation]);
 

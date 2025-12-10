@@ -705,6 +705,8 @@ export const useGameStore = create<GameStore>()(
     ),
     {
       name: STORAGE_KEY,
+      // Skip hydration during SSR to prevent mismatches
+      skipHydration: true,
       // Persist specific state properties, excluding action methods
       partialize: (state) => ({
         phase: state.phase,
