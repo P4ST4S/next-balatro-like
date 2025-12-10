@@ -161,10 +161,10 @@ Score requirements scale with Ante level. Beat all 3 blinds to advance to the ne
 After beating each blind, you visit the shop:
 
 - **3 Random Jokers** available for purchase
-- Prices vary by rarity: Common ($5), Uncommon ($7), Rare ($10), Legendary ($15)
+- Prices vary by rarity: Common ($4), Uncommon ($6), Rare ($8), Legendary ($12)
 - **Reroll** - Refresh shop items for $5 (increases by $1 each reroll)
 - **Sell Jokers** - Get back half their purchase price
-- Money earned from blinds: Small ($3-4), Big ($5), Boss ($8)
+- Money earned from blinds: Small ($3), Big ($4), Boss ($5)
 
 ## 🎮 Game State Management
 

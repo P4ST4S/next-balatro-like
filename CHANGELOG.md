@@ -34,9 +34,9 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 
 - **Shop Interface** - Visit shop after each blind victory
 - **Random Joker Generation** - 3 random Jokers available per shop visit
-- **Dynamic Pricing** - Prices based on rarity (Common $5, Uncommon $7, Rare $10, Legendary $15)
-- **Reroll System** - Refresh shop inventory for $5 (cost increases per reroll)
-- **Money Rewards** - Earn money from winning blinds (Small $3-4, Big $5, Boss $8)
+- **Dynamic Pricing** - Prices based on rarity (Common $4, Uncommon $6, Rare $8, Legendary $12)
+- **Reroll System** - Refresh shop inventory for $5 (cost increases by $1 each reroll)
+- **Money Rewards** - Earn money from winning blinds (Small $3, Big $4, Boss $5)
 - **Starting Money** - Begin each run with $4
 
 #### UI/UX
