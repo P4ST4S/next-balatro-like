@@ -14,6 +14,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 ### ✨ Added - Game Features
 
 #### Core Gameplay
+
 - **Complete Poker Hand Evaluation** - All 9 standard poker hands (High Card through Straight Flush)
 - **5-Card Hand System** - Select 1-5 cards to play poker hands
 - **Scoring System** - Base chips + multipliers with real-time score calculation
@@ -22,6 +23,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 - **Combat Mechanics** - Limited hands (4) and discards (3) per blind
 
 #### Joker System
+
 - **Multiple Joker Types** - Common, Uncommon, Rare, and Legendary rarities
 - **Trigger System** - Jokers activate `onScore` or `onEndCalculation`
 - **Joker Effects** - Flat chip bonuses, multiplier bonuses, conditional multipliers
@@ -29,6 +31,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 - **Sell System** - Sell Jokers for half their purchase price
 
 #### Shop & Economy
+
 - **Shop Interface** - Visit shop after each blind victory
 - **Random Joker Generation** - 3 random Jokers available per shop visit
 - **Dynamic Pricing** - Prices based on rarity (Common $5, Uncommon $7, Rare $10, Legendary $15)
@@ -37,6 +40,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 - **Starting Money** - Begin each run with $4
 
 #### UI/UX
+
 - **Main Menu** - New Run and Continue Run options
 - **Auto-Save** - Game progress automatically saved to localStorage
 - **Smooth Animations** - Card flip animations powered by Framer Motion
@@ -46,6 +50,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 - **Joker Display** - Visual slots showing active Jokers
 
 #### Game Flow
+
 - **Menu Phase** - Start new runs or continue existing progress
 - **Playing Hand Phase** - Draw cards, select hands, play or discard
 - **Shop Phase** - Purchase Jokers and manage inventory
@@ -54,12 +59,14 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 ### 🏗️ Added - Technical Implementation
 
 #### State Management
+
 - **Zustand Store** - Centralized game state with DevTools integration
 - **State Persistence** - Auto-save to localStorage with `persist` middleware
 - **Selectors** - Optimized state selectors for performance
 - **Type-Safe Actions** - 30+ typed store actions for game management
 
 #### Core Libraries
+
 - **Poker Evaluator** (`src/lib/pokerEvaluator.ts`) - Hand type detection and scoring card identification
 - **Scoring Engine** (`src/lib/scoringEngine.ts`) - Calculate final scores with Joker effects
 - **Deck Utilities** (`src/lib/deck.ts`) - Standard 52-card deck with Fisher-Yates shuffle
@@ -68,6 +75,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 - **Shop Generator** (`src/lib/shop.ts`) - Random shop item generation
 
 #### Testing
+
 - **Unit Tests** - Comprehensive test coverage for core game logic
   - Poker hand evaluation tests
   - Scoring engine tests
@@ -77,6 +85,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 - **Test Files** - 5 test files with edge case coverage
 
 #### Components
+
 - **Game.tsx** - Main game interface with hand playing logic
 - **Menu.tsx** - Main menu with New Run/Continue Run
 - **Shop.tsx** - Shop interface for Joker purchases
@@ -86,6 +95,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 - **GameStoreDebug.tsx** - Debug panel for development
 
 #### Type Safety
+
 - **Full TypeScript** - 100% typed codebase (2,900+ lines)
 - **Strict Mode** - No `any` types in production code
 - **Type Definitions** (`src/types/game.ts`) - Comprehensive interfaces:
@@ -95,6 +105,7 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
   - `RunState`, `CombatState`, `InventoryState` - Organized state sections
 
 #### Documentation
+
 - **README.md** - Comprehensive project documentation
 - **STORE_ARCHITECTURE.md** - Game state management guide
 - **POKER_EVALUATOR.md** - Hand evaluation system documentation
@@ -116,12 +127,14 @@ The first production-ready release of the Balatro-Like Card Game! A fully playab
 ### 📋 Game Design Decisions
 
 #### Balatro-Inspired Mechanics
+
 - **Scoring Cards Only** - Only cards that form the hand trigger Joker effects (core Balatro mechanic)
 - **Joker Stacking** - Multiple Jokers combine for powerful synergies
 - **Progressive Difficulty** - Blinds scale with ante level for long-term challenge
 - **Resource Management** - Balance hands, discards, and money spending
 
 #### Technical Choices
+
 - **Fisher-Yates Shuffle** - Cryptographically sound shuffling for fair randomness
 - **Zustand over Redux** - Simpler API, smaller bundle, no Provider boilerplate
 - **CSS Modules over Tailwind** - Type-safe styles with zero runtime overhead
@@ -160,6 +173,7 @@ pnpm dev
 While V1 is feature-complete, potential future enhancements include:
 
 ### Planned Features (V2+)
+
 - **Boss Blind Mechanics** - Special rules that modify gameplay (e.g., locked suits, burning Jokers)
 - **Card Enhancements** - Bonus, mult, wild, glass, steel, stone cards
 - **Card Editions** - Foil, holographic, polychrome variants
@@ -175,6 +189,7 @@ While V1 is feature-complete, potential future enhancements include:
 - **Multiplayer** - Compare runs with friends
 
 ### Technical Improvements
+
 - **Database Integration** - Save runs to cloud database
 - **Leaderboards** - Global high score tracking
 - **Replay System** - Watch previous runs

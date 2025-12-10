@@ -140,6 +140,7 @@ Jokers are special cards that modify your scoring:
 - **Legendary Jokers** - Game-changing effects
 
 Each Joker triggers at specific times:
+
 - `onScore` - Applied when hand is played
 - `onEndCalculation` - Applied after all scoring
 
@@ -302,6 +303,7 @@ The production server runs on port 3000 by default.
 ### Fisher-Yates Shuffle
 
 We use the [Fisher-Yates algorithm](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle) for deck shuffling because:
+
 - **Uniform Distribution** - Every permutation equally likely
 - **Efficient** - O(n) time, O(1) space
 - **Industry Standard** - Proven and well-tested
