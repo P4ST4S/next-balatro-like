@@ -28,53 +28,74 @@ export function ScoreAnimation({ chips, mult, finalScore, onComplete }: ScoreAni
     let chipsControl: ReturnType<typeof animate> | undefined;
     let multControl: ReturnType<typeof animate> | undefined;
     let scoreControl: ReturnType<typeof animate> | undefined;
+    let isCancelled = false;
 
     const sequence = async () => {
-      // Phase 1: Count up chips
-      setPhase("chips");
-      chipsControl = animate(chipsDisplay, chips, {
-        duration: CHIPS_ANIMATION_DURATION,
-        ease: "easeOut",
-      });
-      await chipsControl;
+      try {
+        // Phase 1: Count up chips
+        if (isCancelled) return;
+        setPhase("chips");
+        chipsControl = animate(chipsDisplay, chips, {
+          duration: CHIPS_ANIMATION_DURATION,
+          ease: "easeOut",
+        });
+        await chipsControl;
 
-      // Wait a moment
-      await new Promise((resolve) => setTimeout(resolve, PHASE_DELAY_MS));
+        // Wait a moment
+        if (isCancelled) return;
+        await new Promise((resolve) => setTimeout(resolve, PHASE_DELAY_MS));
 
-      // Phase 2: Count up mult
-      setPhase("mult");
-      multControl = animate(multDisplay, mult, {
-        duration: MULT_ANIMATION_DURATION,
-        ease: "easeOut",
-      });
-      await multControl;
+        // Phase 2: Count up mult
+        if (isCancelled) return;
+        setPhase("mult");
+        multControl = animate(multDisplay, mult, {
+          duration: MULT_ANIMATION_DURATION,
+          ease: "easeOut",
+        });
+        await multControl;
 
-      // Wait a moment
-      await new Promise((resolve) => setTimeout(resolve, PHASE_DELAY_MS));
+        // Wait a moment
+        if (isCancelled) return;
+        await new Promise((resolve) => setTimeout(resolve, PHASE_DELAY_MS));
 
-      // Phase 3: Show multiplication
-      setPhase("multiply");
-      await new Promise((resolve) => setTimeout(resolve, MULTIPLY_PHASE_DELAY_MS));
+        // Phase 3: Show multiplication
+        if (isCancelled) return;
+        setPhase("multiply");
+        await new Promise((resolve) => setTimeout(resolve, MULTIPLY_PHASE_DELAY_MS));
 
-      // Phase 4: Count up final score
-      setPhase("complete");
-      scoreControl = animate(scoreDisplay, finalScore, {
-        duration: SCORE_ANIMATION_DURATION,
-        ease: "easeOut",
-      });
-      await scoreControl;
+        // Phase 4: Count up final score
+        if (isCancelled) return;
+        setPhase("complete");
+        scoreControl = animate(scoreDisplay, finalScore, {
+          duration: SCORE_ANIMATION_DURATION,
+          ease: "easeOut",
+        });
+        await scoreControl;
 
-      if (onComplete) {
-        onComplete();
+        if (!isCancelled && onComplete) {
+          onComplete();
+        }
+      } catch (error) {
+        // Silently handle animation errors during cleanup
+        // This prevents errors when animations are interrupted
+        console.debug("Animation sequence interrupted:", error);
       }
     };
 
     sequence();
 
     return () => {
-      chipsControl?.stop();
-      multControl?.stop();
-      scoreControl?.stop();
+      isCancelled = true;
+      // Safely stop all animation controls
+      if (chipsControl && typeof chipsControl.stop === "function") {
+        chipsControl.stop();
+      }
+      if (multControl && typeof multControl.stop === "function") {
+        multControl.stop();
+      }
+      if (scoreControl && typeof scoreControl.stop === "function") {
+        scoreControl.stop();
+      }
     };
   }, [chips, mult, finalScore, chipsDisplay, multDisplay, scoreDisplay, onComplete]);
 
