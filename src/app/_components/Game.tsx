@@ -2,12 +2,11 @@
 
 import { useGameStore, selectors } from "@/store/gameStore";
 import styles from "./Game.module.css";
-import type { Card } from "@/types/game";
 import { evaluatePokerHand } from "@/lib/pokerEvaluator";
 import { calculateScore } from "@/lib/scoringEngine";
 import { AnimatedCard } from "./AnimatedCard";
 import { ScoreAnimation } from "./ScoreAnimation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // Animation timing constants
 const PLAY_HAND_DELAY_MS = 100;
@@ -18,7 +17,6 @@ const SCORE_ANIMATION_COMPLETE_DELAY_MS = 1000;
  * Displays the actual game interface for playing hands
  */
 export function Game() {
-  const phase = useGameStore((state) => state.phase);
   const run = useGameStore((state) => state.run);
   const combat = useGameStore((state) => state.combat);
   const currentHand = useGameStore((state) => state.currentHand);
@@ -29,6 +27,8 @@ export function Game() {
   const playHand = useGameStore((state) => state.playHand);
   const selectCard = useGameStore((state) => state.selectCard);
   const discardHand = useGameStore((state) => state.discardHand);
+  const resetGame = useGameStore((state) => state.resetGame);
+  const startRound = useGameStore((state) => state.startRound);
 
   const canPlayHand = useGameStore(selectors.canPlayHand);
   const canDiscardHand = useGameStore(selectors.canDiscardHand);
@@ -42,6 +42,8 @@ export function Game() {
     mult: number;
     score: number;
   } | null>(null);
+
+  const handSectionRef = useRef<HTMLDivElement>(null);
 
   // Evaluate current selected hand if 1-5 cards are selected
   const selectedCards = currentHand.filter((c) => c.selected);
@@ -83,6 +85,18 @@ export function Game() {
       }, PLAY_HAND_DELAY_MS);
     }
   };
+
+  const handleReplay = () => {
+    resetGame();
+    setTimeout(() => startRound(), 0);
+  };
+
+  // Auto-scroll when score animation appears
+  useEffect(() => {
+    if (showScoreAnimation && handSectionRef.current) {
+      handSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [showScoreAnimation]);
 
   return (
     <div className={styles.container}>
@@ -135,7 +149,10 @@ export function Game() {
       )}
       {hasLost && (
         <div className={styles.statusMessage} style={{ backgroundColor: "#e74c3c" }}>
-          💀 Game Over! You ran out of hands.
+          <div>💀 Game Over! You ran out of hands.</div>
+          <button className={styles.replayButton} onClick={handleReplay}>
+            🔄 Replay
+          </button>
         </div>
       )}
 
@@ -152,7 +169,7 @@ export function Game() {
 
       {/* Current Hand Display */}
       {currentHand.length > 0 && (
-        <div className={styles.handSection}>
+        <div className={styles.handSection} ref={handSectionRef}>
           <h3 className={styles.sectionTitle}>
             Your Hand ({selectedCardsCount} selected)
           </h3>

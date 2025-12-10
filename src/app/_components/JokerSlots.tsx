@@ -13,9 +13,15 @@ interface JokerSlotsProps {
  */
 export function JokerSlots({ triggeredJokers = [] }: JokerSlotsProps) {
   const jokers = useGameStore((state) => state.inventory.jokers);
+  const removeJoker = useGameStore((state) => state.removeJoker);
+  const phase = useGameStore((state) => state.phase);
 
   // Maximum number of joker slots (can be expanded later)
   const MAX_JOKER_SLOTS = 5;
+
+  const handleDeleteJoker = (jokerId: string) => {
+    removeJoker(jokerId);
+  };
 
   return (
     <div className={styles.container}>
@@ -46,6 +52,15 @@ export function JokerSlots({ triggeredJokers = [] }: JokerSlotsProps) {
                   <p className={styles.jokerDescription}>{joker.description}</p>
                   <div className={styles.jokerFooter}>
                     <span className={styles.sellValue}>Sell: ${joker.sellValue}</span>
+                    {phase === "PLAYING_HAND" && (
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteJoker(joker.id)}
+                        title="Delete joker"
+                      >
+                        🗑️
+                      </button>
+                    )}
                   </div>
                 </div>
               ) : (

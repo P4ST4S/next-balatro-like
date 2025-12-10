@@ -98,6 +98,27 @@
   font-size: 1.125rem;
   margin-bottom: 1.5rem;
   animation: slideIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.replayButton {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #ffffff;
+  color: #e74c3c;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.replayButton:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
 }
 
 @keyframes slideIn {
