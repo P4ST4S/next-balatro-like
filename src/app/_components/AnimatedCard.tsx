@@ -44,7 +44,6 @@ export function AnimatedCard({ card, index, onClick, isSelected }: AnimatedCardP
         transition: { duration: 0.2 }
       }}
       whileTap={{ scale: 0.95 }}
-      layout
     >
       <div className={styles.cardContent}>
         <span className={styles.cardRank}>{card.rank}</span>
