@@ -30,6 +30,13 @@ export function ScoreAnimation({ chips, mult, finalScore, onComplete }: ScoreAni
     let scoreControl: ReturnType<typeof animate> | undefined;
     let isCancelled = false;
 
+    // Helper to safely stop animation controls
+    const stopAnimation = (control: ReturnType<typeof animate> | undefined) => {
+      if (control && typeof control.stop === "function") {
+        control.stop();
+      }
+    };
+
     const sequence = async () => {
       try {
         // Phase 1: Count up chips
@@ -87,15 +94,9 @@ export function ScoreAnimation({ chips, mult, finalScore, onComplete }: ScoreAni
     return () => {
       isCancelled = true;
       // Safely stop all animation controls
-      if (chipsControl && typeof chipsControl.stop === "function") {
-        chipsControl.stop();
-      }
-      if (multControl && typeof multControl.stop === "function") {
-        multControl.stop();
-      }
-      if (scoreControl && typeof scoreControl.stop === "function") {
-        scoreControl.stop();
-      }
+      stopAnimation(chipsControl);
+      stopAnimation(multControl);
+      stopAnimation(scoreControl);
     };
   }, [chips, mult, finalScore, chipsDisplay, multDisplay, scoreDisplay, onComplete]);
 
