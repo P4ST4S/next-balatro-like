@@ -14,6 +14,15 @@ const MAX_HAND_SIZE = 8;
 const MAX_CARDS_SELECTED = 5;
 
 /**
+ * Card sorting constants
+ */
+const SUIT_ORDER = { clubs: 0, diamonds: 1, hearts: 2, spades: 3 };
+const RANK_ORDER: Record<string, number> = {
+  "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
+  "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14,
+};
+
+/**
  * LocalStorage key for persisting game state
  */
 export const STORAGE_KEY = "balatro-like-game-state";
@@ -95,6 +104,8 @@ interface GameActions {
   discardHand: () => void;
   discardCard: (cardId: string) => void;
   resetHand: () => void;
+  sortHandBySuit: () => void;
+  sortHandByValue: () => void;
 
   // Game reset
   resetGame: () => void;
@@ -697,6 +708,40 @@ export const useGameStore = create<GameStore>()(
         ),
 
       resetHand: () => set({ currentHand: [], discardPile: [] }, false, "resetHand"),
+
+      sortHandBySuit: () =>
+        set(
+          (state) => {
+            const sortedHand = [...state.currentHand].sort((a, b) => {
+              // Primary sort: by suit
+              const suitDiff = SUIT_ORDER[a.suit] - SUIT_ORDER[b.suit];
+              if (suitDiff !== 0) return suitDiff;
+              // Secondary sort: by rank ascending
+              return RANK_ORDER[a.rank] - RANK_ORDER[b.rank];
+            });
+
+            return { currentHand: sortedHand };
+          },
+          false,
+          "sortHandBySuit"
+        ),
+
+      sortHandByValue: () =>
+        set(
+          (state) => {
+            const sortedHand = [...state.currentHand].sort((a, b) => {
+              // Primary sort: by rank descending (high to low)
+              const rankDiff = RANK_ORDER[b.rank] - RANK_ORDER[a.rank];
+              if (rankDiff !== 0) return rankDiff;
+              // Secondary sort: by suit
+              return SUIT_ORDER[a.suit] - SUIT_ORDER[b.suit];
+            });
+
+            return { currentHand: sortedHand };
+          },
+          false,
+          "sortHandByValue"
+        ),
 
       // Game reset
       resetGame: () => set(initialState, false, "resetGame"),
