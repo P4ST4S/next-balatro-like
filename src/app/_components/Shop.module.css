@@ -197,6 +197,23 @@
   opacity: 0.5;
 }
 
+.sellButton {
+  padding: 0.5rem 1.5rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sellButton:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
 .actions {
   display: flex;
   gap: 1rem;

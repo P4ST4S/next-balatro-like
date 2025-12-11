@@ -87,6 +87,7 @@ interface GameActions {
   // Inventory management
   addJoker: (joker: GameState["inventory"]["jokers"][number]) => void;
   removeJoker: (jokerId: string) => void;
+  sellJoker: (jokerId: string) => void;
   addConsumable: (consumable: GameState["inventory"]["consumables"][number]) => void;
   removeConsumable: (consumableId: string) => void;
 
@@ -485,6 +486,27 @@ export const useGameStore = create<GameStore>()(
           }),
           false,
           "removeJoker"
+        ),
+
+      sellJoker: (jokerId) =>
+        set(
+          (state) => {
+            const joker = state.inventory.jokers.find((j) => j.id === jokerId);
+            if (!joker) return state;
+
+            return {
+              inventory: {
+                ...state.inventory,
+                jokers: state.inventory.jokers.filter((j) => j.id !== jokerId),
+              },
+              run: {
+                ...state.run,
+                money: state.run.money + joker.sellValue,
+              },
+            };
+          },
+          false,
+          "sellJoker"
         ),
 
       addConsumable: (consumable) =>
