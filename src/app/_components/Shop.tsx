@@ -11,11 +11,13 @@ export function Shop() {
   const money = useGameStore((state) => state.run.money);
   const shopItems = useGameStore((state) => state.shop.items);
   const rerollCost = useGameStore((state) => state.shop.rerollCost);
-  const jokerCount = useGameStore((state) => state.inventory.jokers.length);
+  const jokers = useGameStore((state) => state.inventory.jokers);
+  const jokerCount = jokers.length;
   const currentBlind = useGameStore((state) => state.run.currentBlind);
   const ante = useGameStore((state) => state.run.ante);
 
   const buyJoker = useGameStore((state) => state.buyJoker);
+  const sellJoker = useGameStore((state) => state.sellJoker);
   const rerollShop = useGameStore((state) => state.rerollShop);
   const leaveShop = useGameStore((state) => state.leaveShop);
   const startRound = useGameStore((state) => state.startRound);
@@ -37,6 +39,10 @@ export function Shop() {
   const handleNextRound = () => {
     leaveShop();
     startRound();
+  };
+
+  const handleSell = (jokerId: string) => {
+    sellJoker(jokerId);
   };
 
   return (
@@ -61,6 +67,38 @@ export function Shop() {
           </div>
         </div>
       </div>
+
+      {jokers.length > 0 && (
+        <div className={styles.shopSection}>
+          <h2 className={styles.sectionTitle}>Your Jokers</h2>
+          <div className={styles.itemGrid}>
+            {jokers.map((joker) => (
+              <div key={joker.id} className={styles.itemCard}>
+                <div className={styles.jokerCard}>
+                  <div className={styles.jokerHeader}>
+                    <span className={styles.jokerName}>{joker.name}</span>
+                    <span
+                      className={`${styles.jokerRarity} ${styles[`rarity${joker.rarity.charAt(0).toUpperCase() + joker.rarity.slice(1)}`]}`}
+                    >
+                      {joker.rarity}
+                    </span>
+                  </div>
+                  <p className={styles.jokerDescription}>{joker.description}</p>
+                </div>
+                <div className={styles.purchaseSection}>
+                  <span className={styles.price}>${joker.sellValue}</span>
+                  <button
+                    className={styles.sellButton}
+                    onClick={() => handleSell(joker.id)}
+                  >
+                    Sell
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className={styles.shopSection}>
         <h2 className={styles.sectionTitle}>Available Jokers</h2>
