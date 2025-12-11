@@ -84,9 +84,6 @@ export function Shop() {
                     </span>
                   </div>
                   <p className={styles.jokerDescription}>{joker.description}</p>
-                  <div className={styles.jokerStats}>
-                    <span className={styles.sellValue}>Sell: ${joker.sellValue}</span>
-                  </div>
                 </div>
                 <div className={styles.purchaseSection}>
                   <span className={styles.price}>${joker.sellValue}</span>
